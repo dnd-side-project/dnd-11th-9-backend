@@ -8,6 +8,7 @@ import lombok.Getter;
 @Entity
 @Getter
 public class Project extends BaseEntity {
-    @Id
-    private Long id;
+
+  @Id
+  private Long id;
 }

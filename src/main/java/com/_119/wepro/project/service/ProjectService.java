@@ -4,7 +4,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectService {
-    public void retrieveProjects() {
-        // TODO Not Yet Implemented
-    }
+
+  public void retrieveProjects() {
+    // TODO Not Yet Implemented
+  }
 }

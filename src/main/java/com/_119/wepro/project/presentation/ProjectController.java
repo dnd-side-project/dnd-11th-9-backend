@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
-    @GetMapping()
-    public ResponseEntity<String> getProjects() {
-        return ResponseEntity.ok("Hello World");
-    }
+
+  @GetMapping()
+  public ResponseEntity<String> getProjects() {
+    return ResponseEntity.ok("Hello World");
+  }
 }
