@@ -6,10 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserErrorCode implements ErrorCode {
+public enum ReviewErrorCode implements ErrorCode {
 
-  INACTIVE_USER(HttpStatus.FORBIDDEN, "User is inactive"),
-  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+  OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Option not found"),
+  QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Question not found"),
+  CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Category not found"),
   ;
 
   private final HttpStatus httpStatus;
