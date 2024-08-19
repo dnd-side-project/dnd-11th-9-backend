@@ -1,5 +1,6 @@
 package com._119.wepro.project.presentation;
 
+import com._119.wepro.project.dto.request.ProjectMemberRequest.ProjectMemberCreateRequest;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectSearchCriteria;
 import com._119.wepro.project.dto.response.ProjectResponse;
@@ -54,5 +55,12 @@ public class ProjectController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Long> deleteProject(@PathVariable Long id) {
     return ResponseEntity.ok(projectService.deleteProject(id));
+  }
+
+  @PostMapping("/{id}/member")
+  public ResponseEntity<Void> addMember(@RequestBody ProjectMemberCreateRequest dto,
+      @PathVariable("id") Long id) {
+    projectService.addProjectMember(dto.getMemberId(), id);
+    return ResponseEntity.ok(null);
   }
 }

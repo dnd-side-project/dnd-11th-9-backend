@@ -9,11 +9,13 @@ import lombok.Getter;
 @Builder
 public class MemberListResponse implements Serializable {
 
+  private Long id;
   private String name;
   private String tag;
 
   public static MemberListResponse of(Member member){
     return MemberListResponse.builder()
+        .id(member.getId())
         .name(member.getName())
         .tag(member.getTag())
         .build();

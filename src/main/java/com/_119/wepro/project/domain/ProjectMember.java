@@ -2,10 +2,16 @@ package com._119.wepro.project.domain;
 
 import com._119.wepro.member.domain.Member;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProjectMember {
 
   @Id
