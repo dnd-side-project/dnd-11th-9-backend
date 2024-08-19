@@ -4,6 +4,7 @@ import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectSearchCriteria;
 import com._119.wepro.project.dto.response.ProjectResponse;
 import com._119.wepro.project.service.ProjectService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class ProjectController {
 
   @GetMapping()
   public ResponseEntity<List<ProjectResponse>> searchProjects(
-      @ModelAttribute ProjectSearchCriteria criteria) {
+      @ModelAttribute @Valid ProjectSearchCriteria criteria) {
     List<ProjectResponse> result = projectService.searchProjects(criteria);
     return ResponseEntity.ok(result);
   }
