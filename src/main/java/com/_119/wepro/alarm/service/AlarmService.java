@@ -25,15 +25,7 @@ public class AlarmService {
         -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
     content = sender.getName() + content;
 
-    alarmRepository.save(Alarm.builder()
-        .sender(sender)
-        .receiver(receiver)
-        .alarmType(alarmType)
-        .message(content)
-        .readFlag(false)
-        .targetId(targetId)
-        .build()
-    );
+    alarmRepository.save(Alarm.of(sender, receiver, alarmType, content, targetId));
   }
 
 }
