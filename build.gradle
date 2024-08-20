@@ -37,9 +37,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 
-    // json
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.pglatform:junit-platform-launcher'
