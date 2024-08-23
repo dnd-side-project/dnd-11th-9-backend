@@ -18,7 +18,7 @@ public class ReviewFormQuestionJdbcRepository {
   private final JdbcTemplate jdbcTemplate;
 
   public void batchInsert(List<ReviewFormQuestion> reviewFormQuestions) {
-    String sql = "INSERT INTO review_question (review_form_id, question_id, created_at, updated_at) VALUES (?, ?, ?, ?)";
+    String sql = "INSERT INTO review_form_question (review_form_id, question_id, created_at, updated_at) VALUES (?, ?, ?, ?)";
 
     jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
       @Override
