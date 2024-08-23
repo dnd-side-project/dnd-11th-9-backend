@@ -19,13 +19,11 @@ public class AlarmService {
   private final AlarmRepository alarmRepository;
 
   @Transactional
-  public void createAlarm(Member sender, Long receiverId, AlarmType alarmType, Long targetId,
-      String content) {
+  public void createAlarm(Member sender, Long receiverId, AlarmType alarmType, Long targetId) {
     Member receiver = memberRepository.findById(receiverId).orElseThrow(()
         -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
-    content = sender.getName() + content;
 
-    alarmRepository.save(Alarm.of(sender, receiver, alarmType, content, targetId));
+    alarmRepository.save(Alarm.of(sender, receiver, alarmType, targetId));
   }
 
 }

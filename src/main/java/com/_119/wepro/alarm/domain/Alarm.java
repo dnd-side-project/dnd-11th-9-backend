@@ -49,12 +49,12 @@ public class Alarm extends BaseEntity {
   @Builder.Default
   private boolean readFlag = false;
 
-  public static Alarm of(Member sender, Member receiver, AlarmType alarmType, String message, Long targetId){
+  public static Alarm of(Member sender, Member receiver, AlarmType alarmType, Long targetId){
     return Alarm.builder()
         .sender(sender)
         .receiver(receiver)
         .alarmType(alarmType)
-        .message(message)
+        .message(sender.getName() + alarmType.getMessage())
         .readFlag(false)
         .targetId(targetId)
         .build();
