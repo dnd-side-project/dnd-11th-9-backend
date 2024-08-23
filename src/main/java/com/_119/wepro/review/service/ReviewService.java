@@ -11,10 +11,10 @@ import com._119.wepro.project.domain.Project;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.Question;
 import com._119.wepro.review.domain.ReviewForm;
-import com._119.wepro.review.domain.ReviewQuestion;
+import com._119.wepro.review.domain.ReviewFormQuestion;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.domain.repository.QuestionRepository;
-import com._119.wepro.review.domain.repository.ReviewQuestionJdbcRepository;
+import com._119.wepro.review.domain.repository.ReviewFormQuestionJdbcRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
@@ -31,7 +31,7 @@ public class ReviewService {
   private final ReviewFormRepository reviewFormRepository;
   private final ProjectRepository projectRepository;
   private final QuestionRepository questionRepository;
-  private final ReviewQuestionJdbcRepository reviewQuestionJdbcRepository;
+  private final ReviewFormQuestionJdbcRepository reviewFormQuestionJdbcRepository;
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request, Long memberId) {
@@ -44,24 +44,21 @@ public class ReviewService {
     List<CategoryType> categories = request.getCategories();
     List<Question> questions = categories.stream()
         .flatMap(category -> questionRepository.findByCategoryType(category).stream())
-        .collect(Collectors.toList());
+        .toList();
     if (questions.isEmpty()) {
-      throw new RestApiException(ReviewErrorCode.QUESTION_NOT_FOUND);
+      throw new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY);
     }
 
     // 리뷰 폼 생성 및 저장
     ReviewForm reviewForm = ReviewForm.of(member, project);
     ReviewForm savedReviewForm = reviewFormRepository.save(reviewForm);
 
-    List<ReviewQuestion> reviewQuestions = questions.stream()
-        .map(question -> ReviewQuestion.of(savedReviewForm, question))
+    List<ReviewFormQuestion> reviewFormQuestions = questions.stream()
+        .map(question -> ReviewFormQuestion.of(savedReviewForm, question))
         .collect(Collectors.toList());
-    reviewQuestionJdbcRepository.batchInsert(reviewQuestions);
+    reviewFormQuestionJdbcRepository.batchInsert(reviewFormQuestions);
 
-    return ReviewFormCreateResponse.builder()
-        .reviewFormId(savedReviewForm.getId())
-        .sender(member)
-        .build();
+    return ReviewFormCreateResponse.of(savedReviewForm, member);
   }
 
 }

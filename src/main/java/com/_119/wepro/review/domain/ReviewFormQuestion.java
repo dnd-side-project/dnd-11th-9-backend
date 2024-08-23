@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-public class ReviewQuestion extends BaseEntity {
+public class ReviewFormQuestion extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +33,8 @@ public class ReviewQuestion extends BaseEntity {
   @JoinColumn(name = "question_id")
   private Question question;
 
-  public static ReviewQuestion of(ReviewForm reviewForm, Question question) {
-    return ReviewQuestion.builder()
+  public static ReviewFormQuestion of(ReviewForm reviewForm, Question question) {
+    return ReviewFormQuestion.builder()
         .reviewForm(reviewForm)
         .question(question)
         .build();

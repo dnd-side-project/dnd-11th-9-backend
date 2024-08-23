@@ -39,13 +39,9 @@ public class ReviewForm extends BaseEntity {
   private Project project;
 
   @OneToMany(mappedBy = "reviewForm", cascade = CascadeType.ALL)
-  private List<ReviewQuestion> reviewQuestions;
+  private List<ReviewFormQuestion> reviewFormQuestions;
 
   public static ReviewForm of(Member member, Project project) {
     return ReviewForm.builder().member(member).project(project).build();
-  }
-
-  public void setReviewQuestions(List<ReviewQuestion> reviewQuestions) {
-    this.reviewQuestions = reviewQuestions;
   }
 }
