@@ -2,12 +2,11 @@ package com._119.wepro.review.domain;
 
 import com._119.wepro.global.BaseEntity;
 import com._119.wepro.global.enums.CategoryType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ public class Question extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private CategoryType categoryType;
 
-  @OneToMany(mappedBy = "question")
+  @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
   @Builder.Default
   private List<ChoiceOption> options = new ArrayList<>();
 

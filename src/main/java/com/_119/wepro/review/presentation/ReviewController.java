@@ -30,9 +30,8 @@ public class ReviewController {
     ReviewFormCreateResponse result = reviewService.createReviewForm(request, memberId);
 
     // 리뷰 폼 공유 - 리뷰 요청 받은 사람들에 대해 알림 생성
-    String message = "님이 리뷰를 요청했습니다.";
     request.getReviewerIdList().forEach(reviewerId ->
-        alarmService.createAlarm(result.getSender(), reviewerId, AlarmType.REVIEW_REQUEST, result.getReviewFormId(),  message)
+        alarmService.createAlarm(result.getSender(), reviewerId, AlarmType.REVIEW_REQUEST, result.getReviewFormId())
     );
     return ResponseEntity.ok().build();
   }
