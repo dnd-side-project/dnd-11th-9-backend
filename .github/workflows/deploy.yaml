@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  S3_BUCKET_NAME: wepro
+  S3_BUCKET_NAME: wepro1
   RESOURCE_PATH: ./src/main/resources/application.yaml
   CODE_DEPLOY_APPLICATION_NAME: wepro-code-deploy
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: wepro-server
