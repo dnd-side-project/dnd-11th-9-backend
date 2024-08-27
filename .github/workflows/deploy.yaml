@@ -22,6 +22,7 @@ jobs:
         ports:
           - 3306:3306
         env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
           MYSQL_DATABASE: wepro
           MYSQL_USER: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
           MYSQL_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
