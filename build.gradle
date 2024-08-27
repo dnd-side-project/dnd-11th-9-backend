@@ -60,6 +60,9 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+jar {
+    enabled = false
+}
 clean {
     delete file('src/main/generated')
 }
