@@ -1,6 +1,7 @@
 package com._119.wepro.project.service;
 
 import static com._119.wepro.global.exception.errorcode.CommonErrorCode.RESOURCE_NOT_FOUND;
+import static com._119.wepro.project.domain.ProjectMemberType.MEMBER;
 
 import com._119.wepro.global.exception.RestApiException;
 import com._119.wepro.member.domain.Member;
@@ -17,6 +18,7 @@ import com._119.wepro.project.dto.response.ProjectDetailResponse;
 import com._119.wepro.project.dto.response.ProjectListResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +45,31 @@ public class ProjectService {
     return ProjectDetailResponse.of(project);
   }
 
+  @Transactional
   public void createProject(ProjectCreateRequest projectCreateRequest) {
     Project newProject = Project.of(projectCreateRequest);
+    projectRepository.save(newProject);
+
+    // todo:프로젝트장이될 멤버의 역할처리
+    for (Long memberId : projectCreateRequest.getMemberList()) {
+      Optional<Member> memberOptional = memberRepository.findById(memberId);
+      if (memberOptional.isPresent()) {
+        Member member = memberOptional.get();
+
+        ProjectMember projectMember = ProjectMember.builder()
+            .project(newProject)
+            .member(member)
+            .role(MEMBER.name())
+            .build();
+
+        projectMemberRepository.save(projectMember);
+
+        newProject.setMemberNum(newProject.getMemberNum() + 1);
+      } else {
+        throw new IllegalArgumentException("Invalid member ID: " + memberId);
+      }
+    }
+
     projectRepository.save(newProject);
   }
 

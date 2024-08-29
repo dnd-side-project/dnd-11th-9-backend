@@ -52,7 +52,9 @@ dependencies {
             "jakarta.annotation:jakarta.annotation-api",
             "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
 
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.528'
+    // AWS S3
+    implementation(platform("software.amazon.awssdk:bom:2.21.1"))
+    implementation("software.amazon.awssdk:s3")
 
     // ehcache
     implementation 'org.springframework.boot:spring-boot-starter-cache'

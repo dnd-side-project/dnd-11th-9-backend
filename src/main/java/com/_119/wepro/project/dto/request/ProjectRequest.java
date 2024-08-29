@@ -27,7 +27,7 @@ public class ProjectRequest {
     //    private String imgUrl;
     private LocalDate startDate;
     private LocalDate endDate;
-    //  List<User> memberList;
+    private List<Long> memberList;
     //TODO: ProjectLink class 생성
 //    private List<String> linkList;
 
