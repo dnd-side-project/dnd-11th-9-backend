@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  S3_BUCKET_NAME: wepro
+  S3_BUCKET_NAME: wepro1
   RESOURCE_PATH: ./src/main/resources/application.yaml
   CODE_DEPLOY_APPLICATION_NAME: wepro-code-deploy
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: wepro-server
@@ -15,6 +15,20 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+          MYSQL_DATABASE: wepro
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout
@@ -37,6 +51,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
+
+      - name: Wait for MySQL
+        run: |
+            while ! mysqladmin ping -h"127.0.0.1" --silent; do
+              echo "Waiting for MySQL to be ready..."
+              sleep 1
+            done
 
       - name: Build with Gradle
         run: ./gradlew build
