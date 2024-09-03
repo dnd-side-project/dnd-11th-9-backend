@@ -1,6 +1,5 @@
 package com._119.wepro.member.domain;
 
-import com._119.wepro.auth.dto.response.OIDCDecodePayload;
 import com._119.wepro.global.BaseEntity;
 import com._119.wepro.global.enums.Provider;
 import com._119.wepro.global.enums.Role;

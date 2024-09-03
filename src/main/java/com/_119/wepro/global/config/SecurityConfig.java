@@ -1,7 +1,7 @@
 package com._119.wepro.global.config;
 
-import com._119.wepro.global.security.jwt.JwtTokenProvider;
-import com._119.wepro.global.security.jwt.JwtTokenFilter;
+import com._119.wepro.auth.jwt.JwtTokenProvider;
+import com._119.wepro.auth.jwt.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
