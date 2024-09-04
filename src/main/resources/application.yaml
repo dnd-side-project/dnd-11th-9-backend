@@ -15,5 +15,10 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-
-
+---
+kakao:
+  client-id: ${kakao.client-id}
+  client-secret: EN0ZGfmtay9f5WQzqaFtwAa6vh3YJ5F3
+  redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+  iss: https://kauth.kakao.com
+  authorization-uri: https://kauth.kakao.com/oauth/authorize

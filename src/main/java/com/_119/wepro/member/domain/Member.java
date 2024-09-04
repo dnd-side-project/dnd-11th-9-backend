@@ -12,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostPersist;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,12 @@ public class Member extends BaseEntity {
 
   private LocalDateTime inactivatedAt;
 
+  // 엔티티가 저장된 후 id로 태그를 생성합니다.
+  @PostPersist
+  public void generateTag() {
+    this.tag = this.id.toString();
+  }
+
   public static Member of(SignInRequest request, OidcUser oidcDecodePayload) {
     return Member.builder()
         .profile(oidcDecodePayload.getPicture())
@@ -64,8 +71,7 @@ public class Member extends BaseEntity {
         .role(Role.GUEST)
         .providerId(oidcDecodePayload.getName())
         .status(Status.ACTIVE)
-        //Todo 태그 생성하기
-//        .tag()
+        // 태그는 나중에 설정됩니다.
         .build();
   }
 }
