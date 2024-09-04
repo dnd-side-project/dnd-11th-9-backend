@@ -21,8 +21,8 @@ public class KakaoService {
 
   private final KakaoOauthClient kakaoOauthClient;
 
-  // 임시
-  private static final String LOGIN_URI = "http://localhost:8080/login";
+  @Value("${login.uri}")
+  private String LOGIN_URI;
 
   @Value("${kakao.client-id}")
   private String CLIENT_ID;

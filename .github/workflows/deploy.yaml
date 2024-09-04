@@ -33,7 +33,11 @@ jobs:
           spring.datasource.url: ${{ secrets.SPRING_DATASOURCE_URL }}
           spring.datasource.username: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
           spring.datasource.password: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-          kakao.client-id: ${{secrets.KAKAO_CLIENT_ID}}
+          jwt.secret: ${{ secrets.JWT_SECRET }}
+          login.uri: ${{ secrets.LOGIN_URI }}
+          kakao.client-id: ${{ secrets.KAKAO_CLIENT_ID }}
+          kakao.client-secret: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          kakao.redirect-uri: ${{ secrets.KAKAO_REDIRECT_URI }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
