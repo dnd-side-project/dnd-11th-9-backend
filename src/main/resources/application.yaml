@@ -14,19 +14,17 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
----
-spring:
   data:
     redis:
       host: localhost
       port: 6379
----
+
 jwt:
   secret: ${jwt.secret}
----
+
 login:
   uri: ${login.uri}
----
+
 kakao:
   client-id: ${kakao.client-id}
   client-secret: ${kakao.client-secret}
