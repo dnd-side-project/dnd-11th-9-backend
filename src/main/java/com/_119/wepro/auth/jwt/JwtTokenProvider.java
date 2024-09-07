@@ -31,7 +31,7 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtTokenProvider {
 
-  private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 1일
+  private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24; // 1일
   private static final long REFRESH_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 7일
   private static final String AUTHORITIES_KEY = "auth";
   private final RedisUtil redisUtil;
