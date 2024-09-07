@@ -4,6 +4,7 @@ import static com._119.wepro.global.exception.errorcode.CommonErrorCode.EXPIRED_
 import static com._119.wepro.global.exception.errorcode.CommonErrorCode.INVALID_TOKEN;
 
 import com._119.wepro.auth.dto.response.TokenInfo;
+import com._119.wepro.global.util.RedisUtil;
 import com._119.wepro.global.enums.Role;
 import com._119.wepro.global.exception.RestApiException;
 import io.jsonwebtoken.Claims;
@@ -30,20 +31,24 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtTokenProvider {
 
-  private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24; // 1일
+  private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 1일
   private static final long REFRESH_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 7일
-
+  private static final String AUTHORITIES_KEY = "auth";
+  private final RedisUtil redisUtil;
   private SecretKey secretKey;
 
-  public JwtTokenProvider(@Value("${jwt.secret}") String key) {
+  public JwtTokenProvider(@Value("${jwt.secret}") String key, RedisUtil redisUtil) {
+    this.redisUtil = redisUtil;
     byte[] keyBytes = key.getBytes();
     this.secretKey = Keys.hmacShaKeyFor(keyBytes);
   }
 
   public TokenInfo generateToken(Long memberId, Role memberRole) {
     String accessToken = generateAccessToken(memberId, memberRole);
-    // TODO: refresh redis에 저장
     String refreshToken = generateRefreshToken();
+
+    deleteInvalidRefreshToken(memberId.toString());
+    redisUtil.setData(memberId.toString(), refreshToken);
 
     return new TokenInfo("Bearer", accessToken, refreshToken);
   }
@@ -61,7 +66,7 @@ public class JwtTokenProvider {
   public Authentication getAuthentication(String accessToken) {
     Claims claims = parseClaims(accessToken);
 
-    if (claims.get("auth") == null) {
+    if (claims.get(AUTHORITIES_KEY) == null) {
       throw new RestApiException(INVALID_TOKEN);
     }
     List<SimpleGrantedAuthority> authority = getAuthorities(claims);
@@ -89,7 +94,6 @@ public class JwtTokenProvider {
 
   private Claims parseClaims(String accessToken) {
     try {
-      // TODO: 블랙 리스트 여부 추가
       return Jwts.parserBuilder()
           .setSigningKey(secretKey)
           .build()
@@ -114,7 +118,7 @@ public class JwtTokenProvider {
 
     return Jwts.builder()
         .setSubject(memberId.toString())
-        .claim("auth", memberRole.name())
+        .claim(AUTHORITIES_KEY, memberRole.name())
         .setIssuedAt(now)
         .setExpiration(expiredDate)
         .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -133,6 +137,28 @@ public class JwtTokenProvider {
 
   private List<SimpleGrantedAuthority> getAuthorities(Claims claims) {
     return Collections.singletonList(new SimpleGrantedAuthority(
-        claims.get("auth").toString()));
+        claims.get(AUTHORITIES_KEY).toString()));
+  }
+
+  public String getRefreshToken(String memberId){
+    return redisUtil.getData(memberId);
+  }
+
+  public void deleteInvalidRefreshToken(String memberId) {
+    redisUtil.deleteData(memberId);
+  }
+
+  public Claims parseExpiredToken(String token) {
+    try {
+      return Jwts.parserBuilder()
+          .setSigningKey(secretKey)
+          .build()
+          .parseClaimsJws(token)
+          .getBody();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
+    } catch (JwtException e) {
+      throw new RestApiException(INVALID_TOKEN);
+    }
   }
 }

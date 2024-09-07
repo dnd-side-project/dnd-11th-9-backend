@@ -29,6 +29,18 @@ public class AuthRequest {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class RefreshRequest {
+    @NotNull
+    private String accessToken;
+
+    @NotNull
+    private String refreshToken;
+  }
+
+  @Getter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class SignUpRequest {
 
     @NotNull

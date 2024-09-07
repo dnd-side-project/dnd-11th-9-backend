@@ -3,32 +3,32 @@ package com._119.wepro.auth.service;
 import static com._119.wepro.global.enums.Provider.APPLE;
 import static com._119.wepro.global.enums.Provider.KAKAO;
 
+import com._119.wepro.auth.dto.request.AuthRequest.SignInRequest;
 import com._119.wepro.auth.dto.response.AuthResponse.SignInResponse;
 import com._119.wepro.auth.dto.response.TokenInfo;
+import com._119.wepro.auth.jwt.JwtTokenProvider;
 import com._119.wepro.global.enums.Provider;
 import com._119.wepro.global.enums.Role;
-import com._119.wepro.auth.jwt.JwtTokenProvider;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
-import com._119.wepro.auth.dto.request.AuthRequest.SignInRequest;
 import jakarta.transaction.Transactional;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.stereotype.Service;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.stereotype.Service;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SignInService {
+public class AuthService {
 
   private final MemberRepository memberRepository;
   private final JwtTokenProvider jwtTokenProvider;
@@ -50,6 +50,11 @@ public class SignInService {
     boolean isNewMember = Role.GUEST == member.getRole();
 
     return new SignInResponse(isNewMember, tokenInfo);
+  }
+
+  @Transactional
+  public void logOut(String memberId) {
+    jwtTokenProvider.deleteInvalidRefreshToken(memberId);
   }
 
 
