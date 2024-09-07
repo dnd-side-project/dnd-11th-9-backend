@@ -2,7 +2,6 @@ package com._119.wepro.auth.client;
 
 import com._119.wepro.auth.dto.response.KakaoTokenResponse;
 import com._119.wepro.auth.dto.response.OIDCPublicKeyResponse;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +22,8 @@ public interface KakaoOauthClient {
       @PathVariable("CODE") String code,
       @PathVariable("CLIENT_SECRET") String client_secret);
 
-  // oidc 공개 키 받아 오기
-  @Cacheable(cacheNames = "KakaoOICD", cacheManager = "oidcCacheManager") // 공개키 자주 요청할 거 같으면, 캐싱하기
+  // oidc 공개 키 받아 오기 - 안 쓸 예정
+//  @Cacheable(cacheNames = "KakaoOICD", cacheManager = "oidcCacheManager") // 공개키 자주 요청할 거 같으면, 캐싱하기
   @GetMapping("/.well-known/jwks.json")
   OIDCPublicKeyResponse getOIDCPublicKey();
 }
