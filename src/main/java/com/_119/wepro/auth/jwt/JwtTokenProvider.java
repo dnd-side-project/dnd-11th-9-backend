@@ -4,9 +4,9 @@ import static com._119.wepro.global.exception.errorcode.CommonErrorCode.EXPIRED_
 import static com._119.wepro.global.exception.errorcode.CommonErrorCode.INVALID_TOKEN;
 
 import com._119.wepro.auth.dto.response.TokenInfo;
-import com._119.wepro.global.util.RedisUtil;
 import com._119.wepro.global.enums.Role;
 import com._119.wepro.global.exception.RestApiException;
+import com._119.wepro.global.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -43,12 +43,12 @@ public class JwtTokenProvider {
     this.secretKey = Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public TokenInfo generateToken(Long memberId, Role memberRole) {
-    String accessToken = generateAccessToken(memberId, memberRole);
+  public TokenInfo generateToken(String providerId, Role memberRole) {
+    String accessToken = generateAccessToken(providerId, memberRole);
     String refreshToken = generateRefreshToken();
 
-    deleteInvalidRefreshToken(memberId.toString());
-    redisUtil.setData(memberId.toString(), refreshToken);
+    deleteInvalidRefreshToken(providerId);
+    redisUtil.setData(providerId, refreshToken);
 
     return new TokenInfo("Bearer", accessToken, refreshToken);
   }
@@ -112,12 +112,12 @@ public class JwtTokenProvider {
     }
   }
 
-  private String generateAccessToken(Long memberId, Role memberRole) {
+  private String generateAccessToken(String providerId, Role memberRole) {
     Date now = new Date();
     Date expiredDate = new Date(now.getTime() + ACCESS_TOKEN_DURATION);
 
     return Jwts.builder()
-        .setSubject(memberId.toString())
+        .setSubject(providerId)
         .claim(AUTHORITIES_KEY, memberRole.name())
         .setIssuedAt(now)
         .setExpiration(expiredDate)
@@ -140,12 +140,12 @@ public class JwtTokenProvider {
         claims.get(AUTHORITIES_KEY).toString()));
   }
 
-  public String getRefreshToken(String memberId){
-    return redisUtil.getData(memberId);
+  public String getRefreshToken(String provierId) {
+    return redisUtil.getData(provierId);
   }
 
-  public void deleteInvalidRefreshToken(String memberId) {
-    redisUtil.deleteData(memberId);
+  public void deleteInvalidRefreshToken(String provierId) {
+    redisUtil.deleteData(provierId);
   }
 
   public Claims parseExpiredToken(String token) {

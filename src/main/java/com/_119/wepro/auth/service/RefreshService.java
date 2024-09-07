@@ -30,13 +30,14 @@ public class RefreshService {
     if (!isTokenExpired(accessToken)) {
       throw new RestApiException(REFRESH_DENIED);
     }
-    String memberId = jwtTokenProvider.parseExpiredToken(accessToken)
+    String providerId = jwtTokenProvider.parseExpiredToken(accessToken)
         .getSubject();
-    Member member = memberRepository.findById(Long.parseLong(memberId))
+    validateRefreshToken(refreshToken, providerId);
+
+    Member member = memberRepository.findByProviderId(providerId)
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
 
-    validateRefreshToken(refreshToken, memberId);
-    return jwtTokenProvider.generateToken(Long.parseLong(memberId), member.getRole());
+    return jwtTokenProvider.generateToken(providerId, member.getRole());
   }
 
   private boolean isTokenExpired(String accessToken) {

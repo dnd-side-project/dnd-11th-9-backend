@@ -46,15 +46,15 @@ public class AuthService {
     OidcUser oidcDecodePayload = socialLogin(request);
 
     Member member = getOrSaveUser(request, oidcDecodePayload);
-    TokenInfo tokenInfo = jwtTokenProvider.generateToken(member.getId(), member.getRole());
+    TokenInfo tokenInfo = jwtTokenProvider.generateToken(member.getProviderId(), member.getRole());
     boolean isNewMember = Role.GUEST == member.getRole();
 
     return new SignInResponse(isNewMember, tokenInfo);
   }
 
   @Transactional
-  public void logOut(String memberId) {
-    jwtTokenProvider.deleteInvalidRefreshToken(memberId);
+  public void logOut(String providerId) {
+    jwtTokenProvider.deleteInvalidRefreshToken(providerId);
   }
 
 

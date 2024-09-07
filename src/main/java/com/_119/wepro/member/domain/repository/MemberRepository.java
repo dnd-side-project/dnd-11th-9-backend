@@ -8,5 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
+
   Optional<Member> findByProviderAndProviderId(Provider provider, String providerId);
+
+  Optional<Member> findByProviderId(String providerId);
 }

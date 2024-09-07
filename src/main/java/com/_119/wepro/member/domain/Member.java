@@ -1,10 +1,10 @@
 package com._119.wepro.member.domain;
 
+import com._119.wepro.auth.dto.request.AuthRequest.SignInRequest;
 import com._119.wepro.global.BaseEntity;
 import com._119.wepro.global.enums.Provider;
 import com._119.wepro.global.enums.Role;
 import com._119.wepro.global.enums.Status;
-import com._119.wepro.auth.dto.request.AuthRequest.SignInRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,7 +12,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PostPersist;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,11 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Table(
+    indexes = {
+        @Index(name = "idx_provider_id", columnList = "providerId")
+    }
+)
 public class Member extends BaseEntity {
 
   @Id
