@@ -36,13 +36,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
     });
-
-    String clientIp = request.getHeader("X-Forwarded-For");
-    if (clientIp == null) {
-      clientIp = request.getRemoteAddr();
-    }
-    log.error("Invalid token for requestURI: {}, Access from IP: {}", request.getRequestURI(), clientIp);
-
     filterChain.doFilter(request, response);
   }
 

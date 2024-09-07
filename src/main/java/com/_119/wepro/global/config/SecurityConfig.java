@@ -1,7 +1,8 @@
 package com._119.wepro.global.config;
 
-import com._119.wepro.auth.jwt.JwtTokenProvider;
+import com._119.wepro.auth.jwt.JwtTokenExceptionFilter;
 import com._119.wepro.auth.jwt.JwtTokenFilter;
+import com._119.wepro.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,9 +27,10 @@ public class SecurityConfig {
   public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
     return web -> web.ignoring()
         .requestMatchers("/css/**", "/images/**", "/js/**", "/lib/**")
-        .requestMatchers("/", "/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**", "swagger-ui.html", "/v3/api-docs/**")
+        .requestMatchers("/", "/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**",
+            "swagger-ui.html", "/v3/api-docs/**")
         .requestMatchers("/error", "/favicon.ico")
-        .requestMatchers("/auth/**", "/login/oauth2/code/**", "/login");
+        .requestMatchers("/auth/**", "/login/oauth2/code/**", "/login", "/refresh");
   }
 
   @Bean
@@ -42,7 +44,10 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.OPTIONS).permitAll()
             .anyRequest().authenticated()
         )
-        .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+        .logout(logout -> logout.disable())
+        .addFilterBefore(new JwtTokenFilter(jwtTokenProvider),
+            UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new JwtTokenExceptionFilter(), JwtTokenFilter.class);
     return http.build();
   }
 }
