@@ -38,7 +38,7 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
 
 //    response.sendRedirect("http://localhost:3000/");
 
-    response.sendRedirect("http://localhost:3000/home?token=" + tokenInfo.getAccessToken() + "&refresh=" +tokenInfo.getRefreshToken());
+    response.sendRedirect("http://localhost:8081/oauth2/authorization/login?token=" + tokenInfo.getAccessToken() + "&refresh=" +tokenInfo.getRefreshToken());
   }
 
   private void setTokenPairToResponseHeader(
