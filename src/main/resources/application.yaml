@@ -2,9 +2,9 @@ spring:
   application:
     name: wepro
   datasource:
-    url: jdbc:mysql://localhost:3306/wepro?createDatabaseIfNotExist=true
-    username: root
-    password: 1234
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -18,29 +18,50 @@ spring:
   thymeleaf:
     cache: false
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   security:
     debug: true
     oauth2:
       client:
         registration:
           kakao:
-            client-id: 3c33a9a67c89051d03046c402d256eae
-            client-secret: 4g96Wg97wEvRlPq4LESlvAxiIOEFX84V
+            client-id: ${kakao.client-id}
+            client-secret: ${kakao.client-secret}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/kakao
+            redirect-uri: ${kakao.redirect-uri}
             scope: openid
             client-name: Kakao
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            #            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
             user-name-attribute: sub
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
 
+jwt:
+  secret: ${jwt.secret}
 
 logging:
   level:
     org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.core: DEBUG
+
+app:
+  cors:
+    allowedOrigins: http://localhost:3000
+
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: Lax    # 크로스 도메인 세션 유지

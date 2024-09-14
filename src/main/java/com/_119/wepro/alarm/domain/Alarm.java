@@ -54,7 +54,7 @@ public class Alarm extends BaseEntity {
         .sender(sender)
         .receiver(receiver)
         .alarmType(alarmType)
-        .message(sender.getName() + alarmType.getMessage())
+        .message(sender.getProfile().getName() + alarmType.getMessage())
         .readFlag(false)
         .targetId(targetId)
         .build();
