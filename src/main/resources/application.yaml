@@ -15,14 +15,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  thymeleaf:
-    cache: false
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
   security:
     debug: true
     oauth2:
@@ -40,21 +32,18 @@ spring:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            #            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
+            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
             user-name-attribute: sub
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
   secret: ${jwt.secret}
 
-logging:
-  level:
-    org.springframework.web.client.RestTemplate: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2.client: DEBUG
-    org.springframework.security.oauth2.core: DEBUG
 
 app:
   cors:
