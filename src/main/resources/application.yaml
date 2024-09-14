@@ -47,7 +47,7 @@ jwt:
 
 app:
   cors:
-    allowedOrigins: http://localhost:3000
+    allowedOrigins: http://localhost:8081
 
 server:
   servlet:
