@@ -34,23 +34,24 @@ public class JwtTokenProvider {
   private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24; // 1일
   private static final long REFRESH_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 7일
   private static final String AUTHORITIES_KEY = "auth";
+  private static final String GRANT_TYPE = "Bearer";
   private final RedisUtil redisUtil;
-  private SecretKey secretKey;
+  private final SecretKey secretKey;
 
   public JwtTokenProvider(@Value("${jwt.secret}") String key, RedisUtil redisUtil) {
     this.redisUtil = redisUtil;
-    byte[] keyBytes = key.getBytes();
-    this.secretKey = Keys.hmacShaKeyFor(keyBytes);
+    this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
   }
 
   public TokenInfo generateToken(String providerId, Role memberRole) {
     String accessToken = generateAccessToken(providerId, memberRole);
     String refreshToken = generateRefreshToken();
 
+    // TODO: access 블랙리스트?
     deleteInvalidRefreshToken(providerId);
     redisUtil.setData(providerId, refreshToken);
 
-    return new TokenInfo("Bearer", accessToken, refreshToken);
+    return new TokenInfo(GRANT_TYPE, accessToken, refreshToken);
   }
 
   public boolean validateToken(String token) {

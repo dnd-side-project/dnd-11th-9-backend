@@ -49,13 +49,6 @@ public class AuthController {
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping("/signup")
-  @Operation(summary = "직군 정보 받아 최종 회원가입")
-  public ResponseEntity<Void> register(
-      @RequestBody @Valid SignUpRequest request) {
-    return ResponseEntity.ok().build();
-  }
-
   @GetMapping("/auth/kakao")
   @Operation(summary = "Kakao Web 소셜 로그인 용 api, 백엔드용")
   public RedirectView kakaoLogin() {
