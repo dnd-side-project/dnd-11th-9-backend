@@ -4,26 +4,20 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import com._119.wepro.global.filter.JwtTokenExceptionFilter;
 import com._119.wepro.global.filter.JwtTokenFilter;
+import com._119.wepro.global.handler.CustomLogoutHandler;
+import com._119.wepro.global.handler.CustomLogoutSuccessHandler;
 import com._119.wepro.global.security.CustomOidcAuthenticationSuccessHandler;
-import com._119.wepro.global.security.CustomOidcUserService;
 import com._119.wepro.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAuth2AuthorizationServerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -40,7 +34,8 @@ public class WebSecurityConfig {
   public WebSecurityCustomizer webSecurityCustomizer() { // 정적 리소스 제외
     return web -> web.ignoring()
         .requestMatchers("/css/**", "/images/**", "/js/**", "/lib/**")
-        .requestMatchers("/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**", "swagger-ui.html", "/v3/api-docs/**")
+        .requestMatchers("/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**",
+            "swagger-ui.html", "/v3/api-docs/**")
         .requestMatchers("/error", "/favicon.ico");
   }
 
@@ -62,13 +57,18 @@ public class WebSecurityConfig {
             c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(withDefaults())
         .oauth2Login(oauth2Login -> oauth2Login
-            .loginPage("http://localhost:3000/")
-            .failureHandler(customAuthenticationFailureHandler)
-            .successHandler(customOidcAuthenticationSuccessHandler())
+//            .loginPage("http://localhost:3000/")
+                .failureHandler(customAuthenticationFailureHandler)
+                .successHandler(customOidcAuthenticationSuccessHandler())
+        )
+        .logout(logoutConfigurer -> logoutConfigurer
+            .logoutUrl("/logout")
+            .addLogoutHandler(new CustomLogoutHandler(jwtTokenProvider))
+            .logoutSuccessHandler(new CustomLogoutSuccessHandler())
         );
 
     http.addFilterBefore(new JwtTokenFilter(jwtTokenProvider),
-        UsernamePasswordAuthenticationFilter.class)
+            LogoutFilter.class)
         .addFilterBefore(new JwtTokenExceptionFilter(), JwtTokenFilter.class);
     return http.build();
   }
