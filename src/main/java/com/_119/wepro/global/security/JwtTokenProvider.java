@@ -48,7 +48,6 @@ public class JwtTokenProvider {
     String accessToken = generateAccessToken(providerId, memberRole);
     String refreshToken = generateRefreshToken();
 
-    // TODO: access 블랙리스트?
     deleteInvalidRefreshToken(providerId);
     redisUtil.setData(providerId, refreshToken);
 

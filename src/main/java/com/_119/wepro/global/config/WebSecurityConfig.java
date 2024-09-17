@@ -36,7 +36,8 @@ public class WebSecurityConfig {
         .requestMatchers("/css/**", "/images/**", "/js/**", "/lib/**")
         .requestMatchers("/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**",
             "swagger-ui.html", "/v3/api-docs/**")
-        .requestMatchers("/error", "/favicon.ico");
+        .requestMatchers("/error", "/favicon.ico")
+        .requestMatchers("/members/reissue");
   }
 
   @Bean
