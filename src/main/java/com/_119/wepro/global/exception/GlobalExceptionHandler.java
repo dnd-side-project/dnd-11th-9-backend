@@ -3,9 +3,14 @@ package com._119.wepro.global.exception;
 import com._119.wepro.global.dto.ErrorResponseDto;
 import com._119.wepro.global.exception.errorcode.CommonErrorCode;
 import com._119.wepro.global.exception.errorcode.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import feign.FeignException;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -20,9 +25,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static com._119.wepro.global.exception.errorcode.CommonErrorCode.INVALID_PARAMETER;
 
+@RequiredArgsConstructor
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+  private final ObjectMapper objectMapper;
 
   @ExceptionHandler(RestApiException.class)
   public ResponseEntity<Object> handleCustomException(RestApiException e) {
@@ -42,6 +50,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     log.warn("handleAllException", ex);
     ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
     return handleExceptionInternal(errorCode);
+  }
+
+  @ExceptionHandler(FeignException.class)
+  public ResponseEntity feignExceptionHandler(FeignException feignException) throws JsonProcessingException {
+
+    String responseJson = feignException.contentUTF8();
+    Map<String, String> responseMap = objectMapper.readValue(responseJson, Map.class);
+
+    return ResponseEntity
+        .status(feignException.status())
+        .body(responseMap);
   }
 
   private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
