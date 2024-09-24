@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("members")
 @RequiredArgsConstructor
-public class memberController {
+public class MemberController {
 
   private final SecurityUtil securityUtil;
   private final ReissueService reissueService;

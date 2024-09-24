@@ -10,6 +10,7 @@ public enum UserErrorCode implements ErrorCode {
 
   INACTIVE_USER(HttpStatus.FORBIDDEN, "User is inactive"),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
+  UNSUPPORTED_PROVIDER(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported provider"),
   ;
 
   private final HttpStatus httpStatus;

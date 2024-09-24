@@ -18,3 +18,12 @@ services:
       - ${DEFAULT_PATH}/mysql/data:/var/lib/mysql
       - ${DEFAULT_PATH}/mysql/initdb.d:/docker-entrypoint-initdb.d
     restart: always
+  redis:
+    container_name: "redis"
+    image: redis:latest
+    command: redis-server --port 6379
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${DEFAULT_PATH}/redis/data:/data
+    restart: always
