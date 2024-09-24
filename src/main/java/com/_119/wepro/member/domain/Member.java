@@ -1,11 +1,8 @@
 package com._119.wepro.member.domain;
 
-import com._119.wepro.auth.dto.request.AuthRequest.SignInRequest;
 import com._119.wepro.global.BaseEntity;
-import com._119.wepro.global.enums.Provider;
-import com._119.wepro.global.enums.Role;
-import com._119.wepro.global.enums.Status;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 @Entity
 @Getter
@@ -39,24 +35,19 @@ public class Member extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String profile;
+  @Embedded
+  private Profile profile;
 
-  private String name;
-
-  @Enumerated(value = EnumType.STRING)
-  @Column(length = 10, nullable = false)
-  private Provider provider;
-
-  @Column(length = 20, nullable = false)
-  private String providerId;
+  @Embedded
+  private OauthInfo oauthInfo;
 
   @Enumerated(value = EnumType.STRING)
   @Column(length = 10, nullable = false)
-  private Status status;
+  private MemberStatus status;
 
   @Enumerated(value = EnumType.STRING)
   @Column(length = 10, nullable = false)
-  private Role role;
+  private MemberRole role;
 
   private String position;
 
@@ -65,20 +56,18 @@ public class Member extends BaseEntity {
   private LocalDateTime inactivatedAt;
 
   // 엔티티가 저장된 후 id로 태그를 생성합니다.
+  //todo 태그 저장안되는 이슈 확인하기
   @PostPersist
   public void generateTag() {
     this.tag = this.id.toString();
   }
 
-  public static Member of(SignInRequest request, OidcUser oidcDecodePayload) {
+  public static Member createGuestMember(OauthInfo oauthInfo, Profile profile) {
     return Member.builder()
-        .profile(oidcDecodePayload.getPicture())
-        .name(oidcDecodePayload.getNickName())
-        .provider(request.getProvider())
-        .role(Role.GUEST)
-        .providerId(oidcDecodePayload.getName())
-        .status(Status.ACTIVE)
-        // 태그는 나중에 설정됩니다.
+        .oauthInfo(oauthInfo)
+        .profile(profile)
+        .role(MemberRole.GUEST)
+        .status(MemberStatus.ACTIVE)
         .build();
   }
 }
