@@ -4,6 +4,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import com._119.wepro.global.filter.JwtTokenExceptionFilter;
 import com._119.wepro.global.filter.JwtTokenFilter;
+import com._119.wepro.global.handler.CustomLogoutHandler;
+import com._119.wepro.global.handler.CustomLogoutSuccessHandler;
 import com._119.wepro.global.security.CustomOidcAuthenticationSuccessHandler;
 import com._119.wepro.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -29,8 +31,10 @@ public class WebSecurityConfig {
   public WebSecurityCustomizer webSecurityCustomizer() { // 정적 리소스 제외
     return web -> web.ignoring()
         .requestMatchers("/css/**", "/images/**", "/js/**", "/lib/**")
-        .requestMatchers("/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**", "swagger-ui.html", "/v3/api-docs/**")
-        .requestMatchers("/error", "/favicon.ico");
+        .requestMatchers("/swagger-ui-custom.html", "/api-docs/**", "/swagger-ui/**",
+            "swagger-ui.html", "/v3/api-docs/**")
+        .requestMatchers("/error", "/favicon.ico")
+        .requestMatchers("/members/reissue");
   }
 
   @Bean
@@ -51,12 +55,17 @@ public class WebSecurityConfig {
             c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(withDefaults())
         .oauth2Login(oauth2Login -> oauth2Login
-            .failureHandler(customAuthenticationFailureHandler)
-            .successHandler(customOidcAuthenticationSuccessHandler())
+                .failureHandler(customAuthenticationFailureHandler)
+                .successHandler(customOidcAuthenticationSuccessHandler())
+        )
+        .logout(logoutConfigurer -> logoutConfigurer
+            .logoutUrl("/logout")
+            .addLogoutHandler(new CustomLogoutHandler(jwtTokenProvider))
+            .logoutSuccessHandler(new CustomLogoutSuccessHandler())
         );
 
     http.addFilterBefore(new JwtTokenFilter(jwtTokenProvider),
-        UsernamePasswordAuthenticationFilter.class)
+            LogoutFilter.class)
         .addFilterBefore(new JwtTokenExceptionFilter(), JwtTokenFilter.class);
     return http.build();
   }
