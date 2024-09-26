@@ -6,6 +6,7 @@ import static com._119.wepro.global.security.constant.SecurityConstants.REFRESH_
 import com._119.wepro.global.util.SecurityUtil;
 import com._119.wepro.member.service.ReissueService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +31,8 @@ public class MemberController {
 
   @PostMapping("/reissue")
   @Operation(summary = "access token 재발급")
-  public ResponseEntity<Void> refresh(
-      @RequestHeader(REFRESH_TOKEN_HEADER) String refreshToken,
-      @RequestHeader(ACCESS_TOKEN_HEADER) String accessToken, HttpServletResponse response) {
-    reissueService.reissue(refreshToken, accessToken, response);
+  public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
+    reissueService.reissue(request, response);
     return ResponseEntity.ok().build();
   }
 }
