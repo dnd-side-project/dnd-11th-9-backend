@@ -14,6 +14,7 @@ import com._119.wepro.global.exception.errorcode.UserErrorCode;
 import com._119.wepro.global.security.JwtTokenProvider;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,14 +26,15 @@ public class ReissueService {
   private final JwtTokenProvider jwtTokenProvider;
   private final MemberRepository memberRepository;
 
-  public void reissue(String refreshToken, String accessToken, HttpServletResponse response) {
-    String exRefreshToken = extractToken(refreshToken);
-    String exAccessToken = extractToken(accessToken);
+  public void reissue(HttpServletRequest request, HttpServletResponse response) {
 
-    validateAccessTokenExpired(exAccessToken);
-    String providerId = jwtTokenProvider.parseExpiredToken(exAccessToken).getSubject();
+    String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
+    String accessToken = extractToken(request.getHeader(ACCESS_TOKEN_HEADER));
 
-    validateRefreshToken(exRefreshToken, providerId);
+    validateAccessTokenExpired(accessToken);
+    String providerId = jwtTokenProvider.parseExpiredToken(accessToken).getSubject();
+
+    validateRefreshToken(refreshToken, providerId);
 
     Member member = memberRepository.findByProviderId(providerId)
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
