@@ -26,13 +26,13 @@ public class ReissueService {
   private final MemberRepository memberRepository;
 
   public void reissue(String refreshToken, String accessToken, HttpServletResponse response) {
-    refreshToken = extractToken(refreshToken);
-    accessToken = extractToken(accessToken);
+    String exRefreshToken = extractToken(refreshToken);
+    String exAccessToken = extractToken(accessToken);
 
-    validateAccessTokenExpired(accessToken);
-    String providerId = jwtTokenProvider.parseExpiredToken(accessToken).getSubject();
+    validateAccessTokenExpired(exAccessToken);
+    String providerId = jwtTokenProvider.parseExpiredToken(exAccessToken).getSubject();
 
-    validateRefreshToken(refreshToken, providerId);
+    validateRefreshToken(exRefreshToken, providerId);
 
     Member member = memberRepository.findByProviderId(providerId)
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
