@@ -1,14 +1,20 @@
 package com._119.wepro.global.exception;
 
+import static com._119.wepro.global.exception.errorcode.CommonErrorCode.INVALID_PARAMETER;
+
 import com._119.wepro.global.dto.ErrorResponseDto;
 import com._119.wepro.global.exception.errorcode.CommonErrorCode;
 import com._119.wepro.global.exception.errorcode.ErrorCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import java.util.Collections;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,11 +22,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static com._119.wepro.global.exception.errorcode.CommonErrorCode.INVALID_PARAMETER;
-
+@RequiredArgsConstructor
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+  private final ObjectMapper objectMapper;
 
   @ExceptionHandler(RestApiException.class)
   public ResponseEntity<Object> handleCustomException(RestApiException e) {
@@ -46,6 +53,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.status(errorCode.getHttpStatus()).body(makeErrorResponseDto(errorCode));
   }
 
+  private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode,
+      String customMessage) {
+    return ResponseEntity.status(errorCode.getHttpStatus())
+        .body(ErrorResponseDto.builder()
+            .code(errorCode.name())
+            .message(errorCode.getMessage() + customMessage)
+            .build());
+  }
+
   private ErrorResponseDto makeErrorResponseDto(ErrorCode errorCode) {
     return ErrorResponseDto.builder().code(errorCode.name()).message(errorCode.getMessage())
         .build();
@@ -64,5 +80,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.badRequest()
         .body(new ErrorResponseDto("404", errMessage, Collections.emptyList()));
   }
+
+  @Override
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(
+      @NonNull HttpMessageNotReadableException e,
+      @NonNull HttpHeaders headers,
+      @NonNull HttpStatusCode status,
+      @NonNull WebRequest request) {
+    log.warn("handleHttpMessageNotReadable", e);
+    ErrorCode errorCode = INVALID_PARAMETER;
+    if (e.getCause() instanceof MismatchedInputException mismatchedInputException) {
+      String fieldName = mismatchedInputException.getPath().isEmpty() ? "unknown"
+          : mismatchedInputException.getPath().get(0).getFieldName();
+      return handleExceptionInternal(errorCode, " in field: " + fieldName);
+    }
+    return handleExceptionInternal(errorCode);
+  }
+
 }
 //출처: https://mangkyu.tistory.com/205 [MangKyu's Diary:티스토리]

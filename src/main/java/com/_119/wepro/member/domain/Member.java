@@ -3,18 +3,36 @@ package com._119.wepro.member.domain;
 import com._119.wepro.global.BaseEntity;
 import com._119.wepro.project.domain.ProjectMember;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import java.util.Set;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(
+    indexes = {
+        @Index(name = "idx_provider_id", columnList = "providerId")
+    }
+)
 @Setter
 public class Member extends BaseEntity {
 
@@ -22,30 +40,42 @@ public class Member extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String profile;
+  @Embedded
+  private Profile profile;
 
-  @Column(nullable = false, length = 20)
-  private String name;
+  @Embedded
+  private OauthInfo oauthInfo;
 
-  @Column(nullable = false, length = 10)
-  private String socialType;
+  @Enumerated(value = EnumType.STRING)
+  @Column(length = 10, nullable = false)
+  private MemberStatus status;
 
-  @Column(nullable = false, length = 10)
-  private String state;
+  @Enumerated(value = EnumType.STRING)
+  @Column(length = 10, nullable = false)
+  private MemberRole role;
 
-  private LocalDateTime inactiveDate;
-
-  @Column(nullable = false, length = 10)
-  private String role;
-
-  @Column(nullable = false, length = 20)
   private String position;
 
-  //TODO: 태그에대한 인덱싱 처리할 것
-  @Column(nullable = false, length = 6)
   private String tag;
+
+  private LocalDateTime inactivatedAt;
 
   @OneToMany(mappedBy = "member")
   private Set<ProjectMember> projectMembers;
 
+  // 엔티티가 저장된 후 id로 태그를 생성합니다.
+  //todo 태그 저장안되는 이슈 확인하기
+  @PostPersist
+  public void generateTag() {
+    this.tag = this.id.toString();
+  }
+
+  public static Member createGuestMember(OauthInfo oauthInfo, Profile profile) {
+    return Member.builder()
+        .oauthInfo(oauthInfo)
+        .profile(profile)
+        .role(MemberRole.GUEST)
+        .status(MemberStatus.ACTIVE)
+        .build();
+  }
 }

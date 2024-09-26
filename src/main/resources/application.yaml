@@ -2,9 +2,9 @@ spring:
   application:
     name: wepro
   datasource:
-    username: root
-    password: 1234
-    url: jdbc:mysql://localhost:3306/wepro?createDatabaseIfNotExist=true
+    url: ${datasource.url}
+    username: ${datasource.username}
+    password: ${datasource.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -14,3 +14,43 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+  security:
+    debug: true
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${kakao.client-id}
+            client-secret: ${kakao.client-secret}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: ${kakao.redirect-uri}
+            scope: openid
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v1/oidc/userinfo
+            user-name-attribute: sub
+            jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: ${jwt.secret}
+
+
+app:
+  cors:
+    allowedOrigins: http://localhost:8081
+
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: Lax    # 크로스 도메인 세션 유지
