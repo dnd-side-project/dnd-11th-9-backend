@@ -25,7 +25,7 @@ public class MemberController {
   private final ReissueService reissueService;
 
   @GetMapping("/me")
-  public ResponseEntity<Long> index() {
+  public ResponseEntity<String> index() {
     return ResponseEntity.ok(securityUtil.getCurrentMemberId());
   }
 
