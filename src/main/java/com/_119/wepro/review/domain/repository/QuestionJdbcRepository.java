@@ -1,6 +1,7 @@
 package com._119.wepro.review.domain.repository;
 
 import com._119.wepro.review.domain.Question;
+import com._119.wepro.review.domain.converter.OptionListConverter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -16,9 +17,10 @@ import org.springframework.stereotype.Repository;
 public class QuestionJdbcRepository {
 
   private final JdbcTemplate jdbcTemplate;
+  private final OptionListConverter optionListConverter = new OptionListConverter();;
 
   public void batchInsert(List<Question> questions) {
-    String sql = "INSERT INTO question (id, content, category_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO question (id, content, category_type, options, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
 
     jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
       @Override
@@ -27,8 +29,9 @@ public class QuestionJdbcRepository {
         ps.setLong(1, question.getId());
         ps.setString(2, question.getContent());
         ps.setString(3, question.getCategoryType().name());
-        ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
+        ps.setString(4, optionListConverter.convertToDatabaseColumn(question.getOptions()));
         ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+        ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
       }
 
       @Override
