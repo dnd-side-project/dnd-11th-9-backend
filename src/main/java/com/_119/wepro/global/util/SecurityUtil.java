@@ -9,11 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityUtil {
-  public Long getCurrentMemberId() {
+  public String getCurrentMemberId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     try {
-      // Todo : getName = provider Id이므로 수정할 것 
-      return Long.parseLong(authentication.getName());
+      return authentication.getName();
     } catch (Exception e) {
       throw new RestApiException(USER_NOT_FOUND);
     }
