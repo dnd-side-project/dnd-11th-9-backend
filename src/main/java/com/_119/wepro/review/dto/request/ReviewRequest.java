@@ -1,6 +1,5 @@
 package com._119.wepro.review.dto.request;
 
-import com._119.wepro.global.enums.CategoryType;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,12 +16,10 @@ public class ReviewRequest {
   @AllArgsConstructor
   public static class ReviewFormCreateRequest {
 
-    private List<CategoryType> categories;
-
     @NotNull
     private Long projectId;
 
     @NotNull
-    private List<Long> reviewerIdList;
+    private List<Long> questionIdList;
   }
 }

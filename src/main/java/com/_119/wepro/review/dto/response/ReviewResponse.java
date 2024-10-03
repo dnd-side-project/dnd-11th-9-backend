@@ -12,12 +12,10 @@ public class ReviewResponse {
   public static class ReviewFormCreateResponse {
 
     private Long reviewFormId;
-    private Member sender;
 
-    public static ReviewFormCreateResponse of(ReviewForm reviewForm, Member member) {
+    public static ReviewFormCreateResponse of(ReviewForm reviewForm) {
       return ReviewFormCreateResponse.builder()
           .reviewFormId(reviewForm.getId())
-          .sender(member)
           .build();
     }
   }
