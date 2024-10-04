@@ -22,4 +22,17 @@ public class ReviewRequest {
     @NotNull
     private List<Long> questionIdList;
   }
+
+  @Getter
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ReviewAskRequest{
+
+    @NotNull
+    private Long reviewFormId;
+
+    @NotNull
+    private List<Long> memberIdList;
+  }
 }

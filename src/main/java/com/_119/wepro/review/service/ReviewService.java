@@ -1,5 +1,7 @@
 package com._119.wepro.review.service;
 
+import com._119.wepro.alarm.service.AlarmService;
+import com._119.wepro.global.enums.AlarmType;
 import com._119.wepro.global.exception.RestApiException;
 import com._119.wepro.global.exception.errorcode.ProjectErrorCode;
 import com._119.wepro.global.exception.errorcode.ReviewErrorCode;
@@ -11,6 +13,7 @@ import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.ReviewForm;
 import com._119.wepro.review.domain.repository.QuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReviewService {
 
+  private final AlarmService alarmService;
   private final MemberRepository memberRepository;
   private final ReviewFormRepository reviewFormRepository;
   private final ProjectRepository projectRepository;
@@ -50,4 +54,18 @@ public class ReviewService {
     return ReviewFormCreateResponse.of(savedReviewForm);
   }
 
+  public void requestReview(ReviewAskRequest request, String memberId) {
+    Member member = memberRepository.findByProviderId(memberId)
+        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+
+    List<Long> memberIdList = request.getMemberIdList();
+    memberIdList.stream()
+        .map(id -> memberRepository.findById(id)
+            .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND)))
+        .toList();
+
+    memberIdList.forEach(reviewerId ->
+        alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST, request.getReviewFormId())
+    );
+  }
 }

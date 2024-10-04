@@ -1,6 +1,7 @@
 package com._119.wepro.review.presentation;
 
 import com._119.wepro.global.util.SecurityUtil;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import com._119.wepro.review.service.ReviewService;
@@ -22,10 +23,18 @@ public class ReviewController {
   private final SecurityUtil securityUtil;
 
   @Operation(summary = "리뷰 폼 생성 API")
-  @PostMapping
+  @PostMapping("/form")
   public ResponseEntity<ReviewFormCreateResponse> createReviewForm(
       @RequestBody @Valid ReviewFormCreateRequest request) {
     String memberId = securityUtil.getCurrentMemberId();
     return ResponseEntity.ok(reviewService.createReviewForm(request, memberId));
+  }
+
+  @Operation(summary = "리뷰 요청하기 API")
+  @PostMapping("/request")
+  public ResponseEntity<Void> requestReview(@RequestBody @Valid ReviewAskRequest request) {
+    String memberId = securityUtil.getCurrentMemberId();
+    reviewService.requestReview(request, memberId);
+    return ResponseEntity.ok().build();
   }
 }
