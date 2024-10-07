@@ -45,7 +45,6 @@ public class ReviewForm extends BaseEntity {
 
   @Column(columnDefinition = "json")
   @JdbcTypeCode(SqlTypes.JSON)
-//  @Convert(converter = ListConverter.class)
   private List<Long> questionIdList;
 
   public static ReviewForm of(Member member, Project project, List<Long> questionIdList) {
