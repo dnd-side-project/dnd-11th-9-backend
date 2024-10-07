@@ -39,8 +39,8 @@ public class ReviewService {
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request,
-      String memberId) {
-    Member member = memberRepository.findByProviderId(memberId)
+      Long memberId) {
+    Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
     Project project = projectRepository.findById(request.getProjectId())
         .orElseThrow(() -> new RestApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
@@ -58,8 +58,8 @@ public class ReviewService {
     return ReviewFormCreateResponse.of(savedReviewForm);
   }
 
-  public void requestReview(ReviewAskRequest request, String memberId) {
-    Member member = memberRepository.findByProviderId(memberId)
+  public void requestReview(ReviewAskRequest request, Long memberId) {
+    Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
 
     List<Long> memberIdList = request.getMemberIdList();

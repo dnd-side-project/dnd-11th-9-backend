@@ -24,7 +24,7 @@ public class QuestionController {
   @Operation(summary = "카테고리에 해당하는 질문들 반환 API")
   @GetMapping("/categories")
   public ResponseEntity<QuestionGetResponse> getQuestionsInCategories(@RequestBody @Valid QuestionGetRequest request){
-    String memberId = securityUtil.getCurrentMemberId();
-    return ResponseEntity.ok(questionService.getQuestionsInCategories(request, memberId));
+    securityUtil.getCurrentMemberId();
+    return ResponseEntity.ok(questionService.getQuestionsInCategories(request));
   }
 }

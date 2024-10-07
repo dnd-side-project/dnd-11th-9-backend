@@ -44,12 +44,12 @@ public class JwtTokenProvider {
     this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
   }
 
-  public TokenInfo generateToken(String providerId, MemberRole memberRole) {
-    String accessToken = generateAccessToken(providerId, memberRole);
+  public TokenInfo generateToken(String memberId, MemberRole memberRole) {
+    String accessToken = generateAccessToken(memberId, memberRole);
     String refreshToken = generateRefreshToken();
 
-    deleteInvalidRefreshToken(providerId);
-    redisUtil.setData(providerId, refreshToken);
+    deleteInvalidRefreshToken(memberId);
+    redisUtil.setData(memberId, refreshToken);
 
     return new TokenInfo(GRANT_TYPE, accessToken, refreshToken);
   }
@@ -104,12 +104,12 @@ public class JwtTokenProvider {
     }
   }
 
-  private String generateAccessToken(String providerId, MemberRole memberRole) {
+  private String generateAccessToken(String memberId, MemberRole memberRole) {
     Date now = new Date();
     Date expiredDate = new Date(now.getTime() + ACCESS_TOKEN_DURATION);
 
     return Jwts.builder()
-        .setSubject(providerId)
+        .setSubject(memberId)
         .claim(AUTHORITIES_KEY, memberRole.name())
         .setIssuedAt(now)
         .setExpiration(expiredDate)

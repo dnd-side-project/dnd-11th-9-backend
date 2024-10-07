@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityUtil {
-  public String getCurrentMemberId() {
+  public Long getCurrentMemberId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     try {
-      return authentication.getName();
+      return Long.parseLong(authentication.getName());
     } catch (Exception e) {
       throw new RestApiException(USER_NOT_FOUND);
     }
