@@ -9,12 +9,15 @@ import com._119.wepro.global.exception.errorcode.UserErrorCode;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
 import com._119.wepro.project.domain.Project;
+import com._119.wepro.project.domain.ProjectMember;
+import com._119.wepro.project.domain.repository.ProjectMemberCustomRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.ReviewForm;
 import com._119.wepro.review.domain.repository.QuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
+import com._119.wepro.review.dto.response.ReviewResponse.ProjectMemberGetResponse;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -32,6 +35,7 @@ public class ReviewService {
   private final ReviewFormRepository reviewFormRepository;
   private final ProjectRepository projectRepository;
   private final QuestionRepository questionRepository;
+  private final ProjectMemberCustomRepository projectMemberCustomRepository;
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request,
@@ -65,7 +69,17 @@ public class ReviewService {
         .toList();
 
     memberIdList.forEach(reviewerId ->
-        alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST, request.getReviewFormId())
+        alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
+            request.getReviewFormId())
     );
+  }
+
+  public ProjectMemberGetResponse getProjectMembers(Long reviewFormId) {
+    reviewFormRepository.findById(reviewFormId)
+        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+    List<ProjectMember> filteredMembers = projectMemberCustomRepository.getProjectMembersWithoutReviewRequest(
+        reviewFormId);
+
+    return ProjectMemberGetResponse.of(filteredMembers);
   }
 }
