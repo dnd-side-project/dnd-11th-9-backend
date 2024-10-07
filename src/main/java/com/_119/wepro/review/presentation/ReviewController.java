@@ -29,21 +29,22 @@ public class ReviewController {
   @PostMapping("/form")
   public ResponseEntity<ReviewFormCreateResponse> createReviewForm(
       @RequestBody @Valid ReviewFormCreateRequest request) {
-    String memberId = securityUtil.getCurrentMemberId();
+    Long memberId = securityUtil.getCurrentMemberId();
     return ResponseEntity.ok(reviewService.createReviewForm(request, memberId));
   }
 
   @Operation(summary = "리뷰 요청하기 API")
   @PostMapping("/request")
   public ResponseEntity<Void> requestReview(@RequestBody @Valid ReviewAskRequest request) {
-    String memberId = securityUtil.getCurrentMemberId();
+    Long memberId = securityUtil.getCurrentMemberId();
     reviewService.requestReview(request, memberId);
     return ResponseEntity.ok().build();
   }
 
   @Operation(summary = "프로젝트 멤버 조회(리뷰 요청 받은 멤버 제외) API")
   @GetMapping("/project/members")
-  public ResponseEntity<ProjectMemberGetResponse> getProjectMembers(@RequestParam Long reviewFormId) {
+  public ResponseEntity<ProjectMemberGetResponse> getProjectMembers(
+      @RequestParam Long reviewFormId) {
     securityUtil.getCurrentMemberId();
     return ResponseEntity.ok(reviewService.getProjectMembers(reviewFormId));
   }

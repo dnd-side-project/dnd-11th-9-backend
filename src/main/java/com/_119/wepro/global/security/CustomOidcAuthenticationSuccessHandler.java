@@ -28,7 +28,7 @@ public class CustomOidcAuthenticationSuccessHandler extends SimpleUrlAuthenticat
     CustomOidcUser user = (CustomOidcUser) authentication.getPrincipal();
 
     // 토큰 발급
-    TokenInfo tokenInfo = jwtTokenProvider.generateToken(user.getAttribute("sub"),
+    TokenInfo tokenInfo = jwtTokenProvider.generateToken(String.valueOf(user.getMemberId()),
         user.getMemberRole());
 
     response.sendRedirect(

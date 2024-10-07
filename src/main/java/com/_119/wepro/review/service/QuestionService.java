@@ -17,7 +17,7 @@ public class QuestionService {
 
   private final QuestionRepository questionRepository;
 
-  public QuestionGetResponse getQuestionsInCategories(QuestionGetRequest request, String memberId) {
+  public QuestionGetResponse getQuestionsInCategories(QuestionGetRequest request) {
     List<CategoryType> categories = request.getCategories();
 
     List<Question> questions = categories.stream()
