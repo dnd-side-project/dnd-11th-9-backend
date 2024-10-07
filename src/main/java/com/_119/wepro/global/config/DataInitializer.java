@@ -28,7 +28,6 @@ public class DataInitializer implements ApplicationRunner {
   private final QuestionCustomRepository questionCustomRepository;
 
   private final ObjectMapper objectMapper;
-  private final AtomicLong questionIdCounter = new AtomicLong(1);
   private final AtomicLong optionIdCounter = new AtomicLong(1);
 
   @Override
@@ -59,7 +58,6 @@ public class DataInitializer implements ApplicationRunner {
         categoryQuestions.questions().forEach(questionWithOptions -> {
 
           Question question = Question.builder()
-              .id(questionIdCounter.getAndIncrement())
               .content(questionWithOptions.question())
               .categoryType(categoryType)
               .options(createOptionsForQuestion(questionWithOptions.options()))
