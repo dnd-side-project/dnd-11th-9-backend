@@ -26,6 +26,6 @@ public class ProjectMember {
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  @Column(nullable = false, length = 10)
+  @Column(nullable = false, length = 11)
   private String role;
 }

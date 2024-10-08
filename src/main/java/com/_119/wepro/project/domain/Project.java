@@ -2,6 +2,7 @@ package com._119.wepro.project.domain;
 
 import com._119.wepro.image.domain.Image;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
+import com._119.wepro.project.dto.request.ProjectRequest.ProjectUpdateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,16 +45,16 @@ public class Project {
   @Column(name = "member_num", nullable = false)
   private int memberNum;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<ProjectMember> projectMembers;
 
   private String tag;
 
   @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Image> imgUrls;
+  private List<Image> imageList;
 
-  // 엔티티가 저장된 후 id로 태그를 생성합니다.
-  //todo 태그 저장안되는 이슈 확인하기
+  private String link;
+
   @PostPersist
   public void generateTag() {
     this.tag = this.id.toString();
@@ -66,6 +67,18 @@ public class Project {
         .endDate(projectCreateRequest.getEndDate())
         .info(projectCreateRequest.getDesc())
         .memberNum(0)
+        .link(projectCreateRequest.getLink())
+        .build();
+  }
+
+  public static Project of(ProjectUpdateRequest projectUpdateRequest) {
+    return Project.builder()
+        .name(projectUpdateRequest.getName())
+        .startDate(projectUpdateRequest.getStartDate())
+        .endDate(projectUpdateRequest.getEndDate())
+        .info(projectUpdateRequest.getDesc())
+        .memberNum(0)
+        .link(projectUpdateRequest.getLink())
         .build();
   }
 }

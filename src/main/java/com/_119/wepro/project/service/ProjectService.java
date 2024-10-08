@@ -6,6 +6,7 @@ import static com._119.wepro.project.domain.ProjectMemberType.MEMBER;
 import static com._119.wepro.project.domain.ProjectMemberType.TEAM_LEADER;
 
 import com._119.wepro.global.exception.RestApiException;
+import com._119.wepro.image.domain.Image;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
 import com._119.wepro.project.domain.Project;
@@ -15,11 +16,13 @@ import com._119.wepro.project.domain.repository.ProjectMemberCustomRepository;
 import com._119.wepro.project.domain.repository.ProjectMemberRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
+import com._119.wepro.project.dto.request.ProjectRequest.ProjectUpdateRequest;
+import com._119.wepro.project.dto.response.MyProjectResponse;
 import com._119.wepro.project.dto.response.ProjectDetailResponse;
 import com._119.wepro.project.dto.response.ProjectListResponse;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +42,11 @@ public class ProjectService {
     return result.stream().map(ProjectListResponse::of).toList();
   }
 
+  public List<MyProjectResponse> getMyProjects(Long id) {
+
+    return projectCustomRepository.getMyProjects(id);
+  }
+
   public ProjectDetailResponse getProjectDetail(Long projectId) {
     Project project = projectRepository.findById(projectId)
         .orElseThrow(() -> new RestApiException(RESOURCE_NOT_FOUND));
@@ -47,7 +55,7 @@ public class ProjectService {
   }
 
   @Transactional
-  public void createProject(ProjectCreateRequest projectCreateRequest, Long projectCreatorId) {
+  public Long createProject(ProjectCreateRequest projectCreateRequest, Long projectCreatorId) {
     Project newProject = Project.of(projectCreateRequest);
     projectRepository.save(newProject);
 
@@ -59,7 +67,43 @@ public class ProjectService {
     // 팀장 등록
     registerProjectMember(newProject, projectCreatorId, TEAM_LEADER.name());
 
-    projectRepository.save(newProject);
+    newProject.setImageList(
+        projectCreateRequest.getImgUrls().stream()
+            .map(imgUrl -> Image.of(imgUrl, newProject))
+            .collect(Collectors.toList())
+    );
+
+    return projectRepository.save(newProject).getId();
+  }
+
+  @Transactional
+  public Long updateProject(Long projectId, ProjectUpdateRequest projectUpdateRequest) {
+    Project project = projectRepository.findById(projectId)
+        .orElseThrow(() -> new IllegalArgumentException("Project not found with id: " + projectId));
+
+    Project updatedProject = Project.of(projectUpdateRequest);
+
+    updatedProject.setImageList(projectUpdateRequest.getImgUrls().stream()
+        .map(imgUrl -> Image.of(imgUrl, project))
+        .collect(Collectors.toList()));
+
+    // 기존 팀원 정보 삭제 후 새로 업데이트된 팀원 추가
+    projectMemberRepository.deleteByProjectId(projectId);
+
+    for (Long memberId : projectUpdateRequest.getMemberList()) {
+      Member member = memberRepository.findById(memberId)
+          .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + memberId));
+
+      ProjectMember projectMember = ProjectMember.builder()
+          .project(project)
+          .member(member)
+          .role(MEMBER.name())
+          .build();
+
+      projectMemberRepository.save(projectMember);
+    }
+
+    return projectRepository.save(project).getId();
   }
 
   private void registerProjectMember(Project project, Long memberId, String role) {

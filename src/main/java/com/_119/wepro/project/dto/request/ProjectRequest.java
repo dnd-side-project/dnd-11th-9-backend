@@ -7,16 +7,18 @@ import lombok.Data;
 public class ProjectRequest {
 
   @Data
-  public static class ProjectSearchCriteria {
-    String name;
-    String desc;
-    LocalDate startDate;
-    LocalDate endDate;
-    List<String> memberTagList;
+  public static class ProjectCreateRequest {
+    private String name;
+    private String desc;
+    private List<String> imgUrls;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private List<Long> memberList;
+    private String link;
   }
 
   @Data
-  public static class ProjectCreateRequest {
+  public static class ProjectUpdateRequest {
     private String name;
     private String desc;
     private List<String> imgUrls;

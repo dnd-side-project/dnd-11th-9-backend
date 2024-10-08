@@ -2,6 +2,7 @@ package com._119.wepro.image.domain;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com._119.wepro.global.BaseEntity;
 import com._119.wepro.image.dto.request.ImageCreateRequest;
 import com._119.wepro.project.domain.Project;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = PROTECTED)
 @Entity
 @Builder
-public class Image {
+public class Image extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -35,10 +36,10 @@ public class Image {
   @JoinColumn(name = "project_id")
   private Project project;
 
-  public static Image of(ImageCreateRequest imageCreateRequest) {
+  public static Image of(String url, Project project) {
     return Image.builder()
-        .url(imageCreateRequest.getUrl())
-        .project(imageCreateRequest.getProject())
+        .url(url)
+        .project(project)
         .build();
   }
 }
