@@ -1,4 +1,4 @@
-package com._119.wepro.image.dto;
+package com._119.wepro.image.dto.response;
 
 import com._119.wepro.image.domain.Image;
 import java.util.List;

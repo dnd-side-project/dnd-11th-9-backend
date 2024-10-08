@@ -6,6 +6,7 @@ import com._119.wepro.member.domain.Profile;
 import com._119.wepro.member.domain.Provider;
 import com._119.wepro.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOidcUserService extends OidcUserService {
 
   private final MemberRepository memberRepository;
@@ -21,6 +23,7 @@ public class CustomOidcUserService extends OidcUserService {
   public OidcUser loadUser(OidcUserRequest userRequest) {
 
     OidcUser oidcUser = super.loadUser(userRequest);
+
     Member newMember = fetchOrCreate(oidcUser);
 
     return new CustomOidcUser(oidcUser, newMember.getId(), newMember.getRole());

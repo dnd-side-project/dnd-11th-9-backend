@@ -1,6 +1,7 @@
 package com._119.wepro.member.domain;
 
 import com._119.wepro.global.BaseEntity;
+import com._119.wepro.project.domain.ProjectMember;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -10,14 +11,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -29,6 +33,7 @@ import lombok.NoArgsConstructor;
         @Index(name = "idx_provider_id", columnList = "providerId")
     }
 )
+@Setter
 public class Member extends BaseEntity {
 
   @Id
@@ -54,6 +59,9 @@ public class Member extends BaseEntity {
   private String tag;
 
   private LocalDateTime inactivatedAt;
+
+  @OneToMany(mappedBy = "member")
+  private Set<ProjectMember> projectMembers;
 
   // 엔티티가 저장된 후 id로 태그를 생성합니다.
   //todo 태그 저장안되는 이슈 확인하기

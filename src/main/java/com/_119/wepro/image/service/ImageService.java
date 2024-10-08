@@ -7,7 +7,7 @@ import static com._119.wepro.global.exception.errorcode.ImageErrorCode.INVALID_I
 import com._119.wepro.global.exception.RestApiException;
 import com._119.wepro.image.domain.ImageFile;
 import com._119.wepro.image.domain.S3ImageEvent;
-import com._119.wepro.image.dto.ImagesResponse;
+import com._119.wepro.image.dto.response.ImagesResponse;
 import com._119.wepro.image.infrastructure.ImageUploader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

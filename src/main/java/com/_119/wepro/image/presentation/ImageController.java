@@ -1,6 +1,6 @@
 package com._119.wepro.image.presentation;
 
-import com._119.wepro.image.dto.ImagesResponse;
+import com._119.wepro.image.dto.response.ImagesResponse;
 import com._119.wepro.image.service.ImageService;
 import java.net.URI;
 import java.util.List;
