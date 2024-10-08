@@ -1,6 +1,7 @@
-package com._119.wepro.review.domain;
+package com._119.wepro.project.domain;
 
 import com._119.wepro.global.BaseEntity;
+import com._119.wepro.member.domain.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,24 +20,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-public class ReviewFormQuestion extends BaseEntity {
+public class ProjectMember extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "review_form_id")
-  private ReviewForm reviewForm;
+  @JoinColumn(name = "member_id")
+  private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "question_id")
-  private Question question;
-
-  public static ReviewFormQuestion of(ReviewForm reviewForm, Question question) {
-    return ReviewFormQuestion.builder()
-        .reviewForm(reviewForm)
-        .question(question)
-        .build();
-  }
+  @JoinColumn(name = "project_id")
+  private Project project;
 }
