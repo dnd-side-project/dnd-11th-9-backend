@@ -12,7 +12,6 @@ public class SecurityUtil {
   public Long getCurrentMemberId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     try {
-      // Todo : getName = provider Id이므로 수정할 것 
       return Long.parseLong(authentication.getName());
     } catch (Exception e) {
       throw new RestApiException(USER_NOT_FOUND);
