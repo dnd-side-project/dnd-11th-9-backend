@@ -503,7 +503,7 @@
     ]
   },
   {
-    "categoryType": "SOCIABILITY",
+    "categoryType": "CONSIDERATION",
     "questions": [
       {
         "question": "${username}님은 팀 내에서 다른 팀원들과 협력하는 데 얼마나 적극적이었나요?",

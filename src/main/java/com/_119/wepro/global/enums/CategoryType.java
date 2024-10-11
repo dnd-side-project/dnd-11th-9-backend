@@ -14,7 +14,7 @@ public enum CategoryType {
   PROBLEM_SOLVING("문제해결"),
   DILIGENCE("성실성"),
   IDEATION("아이데이션"),
-  SOCIABILITY("사회성");
+  CONSIDERATION("배려심");
 
   private final String name;
 }
