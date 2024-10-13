@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 public class QuestionJdbcRepository {
 
   private final JdbcTemplate jdbcTemplate;
-  private final OptionListConverter optionListConverter = new OptionListConverter();;
+  private final OptionListConverter optionListConverter = new OptionListConverter();
 
   public void batchInsert(List<Question> questions) {
     String sql = "INSERT INTO question (content, category_type, options, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";

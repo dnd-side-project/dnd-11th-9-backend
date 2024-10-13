@@ -18,5 +18,12 @@ public class OptionDto {
         .content(option.getContent())
         .build();
   }
+
+  public static OptionDto ofWithId(Option option) {
+    return OptionDto.builder()
+        .optionId(option.getId())
+        .content(option.getContent())
+        .build();
+  }
 }
 

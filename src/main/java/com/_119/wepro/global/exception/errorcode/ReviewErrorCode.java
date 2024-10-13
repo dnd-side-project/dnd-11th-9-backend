@@ -12,7 +12,8 @@ public enum ReviewErrorCode implements ErrorCode {
   QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "Question not found"),
   CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Category not found"),
   QUESTIONS_NOT_FOUND_FOR_CATEGORY(HttpStatus.NOT_FOUND, "No questions found for the given category"),
-  REVIEW_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "Review Form not found")
+  REVIEW_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "Review Form not found"),
+  REVIEW_FORM_EXPIRED(HttpStatus.GONE, "Review Form expired"),
   ;
 
   private final HttpStatus httpStatus;

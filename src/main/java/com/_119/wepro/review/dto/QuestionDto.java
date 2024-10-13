@@ -22,5 +22,15 @@ public class QuestionDto {
             .toList())
         .build();
   }
+
+  public static QuestionDto ofWithOptionId(Question question) {
+    return QuestionDto.builder()
+        .questionId(question.getId())
+        .question(question.getContent())
+        .options(question.getOptions().stream()
+            .map(OptionDto::ofWithId)
+            .toList())
+        .build();
+  }
 }
 
