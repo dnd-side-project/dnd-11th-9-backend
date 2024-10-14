@@ -13,7 +13,7 @@ import com._119.wepro.project.domain.ProjectMember;
 import com._119.wepro.project.domain.repository.ProjectMemberCustomRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.ReviewForm;
-import com._119.wepro.review.domain.repository.QuestionRepository;
+import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
@@ -34,7 +34,7 @@ public class ReviewService {
   private final MemberRepository memberRepository;
   private final ReviewFormRepository reviewFormRepository;
   private final ProjectRepository projectRepository;
-  private final QuestionRepository questionRepository;
+  private final ChoiceQuestionRepository choiceQuestionRepository;
   private final ProjectMemberCustomRepository projectMemberCustomRepository;
 
   @Transactional
@@ -47,7 +47,7 @@ public class ReviewService {
 
     List<Long> questionIdList = request.getQuestionIdList();
     questionIdList.stream()
-        .map(id -> questionRepository.findById(id)
+        .map(id -> choiceQuestionRepository.findById(id)
             .orElseThrow(() -> new RestApiException(ReviewErrorCode.QUESTION_NOT_FOUND)))
         .toList();
 

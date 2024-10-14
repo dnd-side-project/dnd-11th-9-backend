@@ -3,11 +3,11 @@ package com._119.wepro.review.service;
 import com._119.wepro.global.enums.CategoryType;
 import com._119.wepro.global.exception.RestApiException;
 import com._119.wepro.global.exception.errorcode.ReviewErrorCode;
-import com._119.wepro.review.domain.Question;
+import com._119.wepro.review.domain.ChoiceQuestion;
 import com._119.wepro.review.domain.ReviewForm;
 import com._119.wepro.review.domain.SubQuestion;
-import com._119.wepro.review.domain.repository.QuestionCustomRepository;
-import com._119.wepro.review.domain.repository.QuestionRepository;
+import com._119.wepro.review.domain.repository.ChoiceQuestionCustomRepository;
+import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.domain.repository.SubQuestionRepository;
 import com._119.wepro.review.dto.response.QuestionResponse.QuestionInCategoriesGetResponse;
@@ -21,22 +21,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class QuestionService {
 
-  private final QuestionRepository questionRepository;
-  private final QuestionCustomRepository questionCustomRepository;
+  private final ChoiceQuestionRepository choiceQuestionRepository;
+  private final ChoiceQuestionCustomRepository choiceQuestionCustomRepository;
   private final ReviewFormRepository reviewFormRepository;
   private final SubQuestionRepository subQuestionRepository;
 
   public QuestionInCategoriesGetResponse getQuestionsInCategories(
       List<CategoryType> categoryTypes) {
 
-    List<Question> questions = categoryTypes.stream()
-        .flatMap(category -> questionRepository.findByCategoryType(category).stream())
+    List<ChoiceQuestion> choiceQuestions = categoryTypes.stream()
+        .flatMap(category -> choiceQuestionRepository.findByCategoryType(category).stream())
         .toList();
-    if (questions.isEmpty()) {
+    if (choiceQuestions.isEmpty()) {
       throw new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY);
     }
 
-    return QuestionInCategoriesGetResponse.of(questions);
+    return QuestionInCategoriesGetResponse.of(choiceQuestions);
   }
 
   public QuestionInReviewFormGetResponse getQuestionsInReviewForm(Long reviewFormId) {
@@ -52,10 +52,10 @@ public class QuestionService {
     // 리뷰 받는 유저의 이름
     String userName = reviewForm.getMember().getProfile().getName();
 
-    List<Question> objQuestions = questionCustomRepository.findAllByIds(
+    List<ChoiceQuestion> choiceQuestions = choiceQuestionCustomRepository.findAllByIds(
         reviewForm.getQuestionIdList());
     List<SubQuestion> subQuestions = subQuestionRepository.findAllByOrderByIdAsc();
 
-    return QuestionInReviewFormGetResponse.of(userName, objQuestions, subQuestions);
+    return QuestionInReviewFormGetResponse.of(userName, choiceQuestions, subQuestions);
   }
 }

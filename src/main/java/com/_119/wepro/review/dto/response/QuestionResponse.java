@@ -1,9 +1,9 @@
 package com._119.wepro.review.dto.response;
 
 import com._119.wepro.global.enums.CategoryType;
-import com._119.wepro.review.domain.Question;
+import com._119.wepro.review.domain.ChoiceQuestion;
 import com._119.wepro.review.domain.SubQuestion;
-import com._119.wepro.review.dto.QuestionDto;
+import com._119.wepro.review.dto.ChoiceQuestionDto;
 import com._119.wepro.review.dto.SubQuestionDto;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +19,9 @@ public class QuestionResponse {
 
     private List<QuestionInCategoryDto> allQuestions;
 
-    public static QuestionInCategoriesGetResponse of(List<Question> questions) {
-      Map<CategoryType, List<Question>> groupedQuestions = questions.stream()
-          .collect(Collectors.groupingBy(Question::getCategoryType));
+    public static QuestionInCategoriesGetResponse of(List<ChoiceQuestion> choiceQuestions) {
+      Map<CategoryType, List<ChoiceQuestion>> groupedQuestions = choiceQuestions.stream()
+          .collect(Collectors.groupingBy(ChoiceQuestion::getCategoryType));
 
       List<QuestionInCategoryDto> allQuestions = groupedQuestions.entrySet().stream()
           .map(entry -> QuestionInCategoryDto.ofWithoutOptionId(entry.getKey(), entry.getValue()))
@@ -41,11 +41,11 @@ public class QuestionResponse {
     private List<QuestionInCategoryDto> objQuestions;
     private List<SubQuestionDto> subQuestions;
 
-    public static QuestionInReviewFormGetResponse of(String userName, List<Question> objQuestions,
+    public static QuestionInReviewFormGetResponse of(String userName, List<ChoiceQuestion> objChoiceQuestions,
         List<SubQuestion> subQuestions) {
 
-      Map<CategoryType, List<Question>> groupedQuestions = objQuestions.stream()
-          .collect(Collectors.groupingBy(Question::getCategoryType));
+      Map<CategoryType, List<ChoiceQuestion>> groupedQuestions = objChoiceQuestions.stream()
+          .collect(Collectors.groupingBy(ChoiceQuestion::getCategoryType));
 
       List<QuestionInCategoryDto> objQuestionDtos = groupedQuestions.entrySet().stream()
           .map(entry -> QuestionInCategoryDto.ofWithOptionId(entry.getKey(), entry.getValue()))
@@ -68,29 +68,29 @@ public class QuestionResponse {
   private static class QuestionInCategoryDto {
 
     private CategoryType categoryType;
-    private List<QuestionDto> questions;
+    private List<ChoiceQuestionDto> questions;
 
     public static QuestionInCategoryDto ofWithoutOptionId(CategoryType categoryType,
-        List<Question> questions) {
-      List<QuestionDto> questionDtos = questions.stream()
-          .map(QuestionDto::ofWithoutOptionId)
+        List<ChoiceQuestion> choiceQuestions) {
+      List<ChoiceQuestionDto> choiceQuestionDtos = choiceQuestions.stream()
+          .map(ChoiceQuestionDto::ofWithoutOptionId)
           .toList();
 
       return QuestionInCategoryDto.builder()
           .categoryType(categoryType)
-          .questions(questionDtos)
+          .questions(choiceQuestionDtos)
           .build();
     }
 
     public static QuestionInCategoryDto ofWithOptionId(CategoryType categoryType,
-        List<Question> questions) {
-      List<QuestionDto> questionDtos = questions.stream()
-          .map(QuestionDto::ofWithOptionId)
+        List<ChoiceQuestion> choiceQuestions) {
+      List<ChoiceQuestionDto> choiceQuestionDtos = choiceQuestions.stream()
+          .map(ChoiceQuestionDto::ofWithOptionId)
           .toList();
 
       return QuestionInCategoryDto.builder()
           .categoryType(categoryType)
-          .questions(questionDtos)
+          .questions(choiceQuestionDtos)
           .build();
     }
   }

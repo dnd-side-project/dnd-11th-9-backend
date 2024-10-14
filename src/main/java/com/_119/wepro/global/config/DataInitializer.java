@@ -1,11 +1,11 @@
 package com._119.wepro.global.config;
 
 import com._119.wepro.global.enums.CategoryType;
+import com._119.wepro.review.domain.ChoiceQuestion;
 import com._119.wepro.review.domain.Option;
-import com._119.wepro.review.domain.Question;
 import com._119.wepro.review.domain.SubQuestion;
-import com._119.wepro.review.domain.repository.QuestionCustomRepository;
-import com._119.wepro.review.domain.repository.QuestionJdbcRepository;
+import com._119.wepro.review.domain.repository.ChoiceQuestionCustomRepository;
+import com._119.wepro.review.domain.repository.ChoiceQuestionJdbcRepository;
 import com._119.wepro.review.domain.repository.SubQuestionCustomRepository;
 import com._119.wepro.review.domain.repository.SubQuestionJdbcRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequiredArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-  private final QuestionJdbcRepository questionJdbcRepository;
-  private final QuestionCustomRepository questionCustomRepository;
+  private final ChoiceQuestionJdbcRepository choiceQuestionJdbcRepository;
+  private final ChoiceQuestionCustomRepository choiceQuestionCustomRepository;
   private final SubQuestionJdbcRepository subQuestionJdbcRepository;
   private final SubQuestionCustomRepository subQuestionCustomRepository;
 
@@ -37,20 +37,20 @@ public class DataInitializer implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    setDefaultObjQuestionsAndOptions();
+    setDefaultChoiceQuestionsAndOptions();
     setDefaultSubQuestions();
   }
 
-  private void setDefaultObjQuestionsAndOptions() {
+  private void setDefaultChoiceQuestionsAndOptions() {
     // DB에 데이터가 없는 경우만 새로 생성
-    if (!questionCustomRepository.exists()) {
+    if (!choiceQuestionCustomRepository.exists()) {
 
-      List<Question> allQuestions = new ArrayList<>();
+      List<ChoiceQuestion> allChoiceQuestions = new ArrayList<>();
       List<CategoryQuestions> categoryQuestionsList;
 
       // JSON 파일 읽기
       try {
-        ClassPathResource resource = new ClassPathResource("default-obj-questions.json");
+        ClassPathResource resource = new ClassPathResource("default-choice-questions.json");
         categoryQuestionsList = objectMapper.readValue(
             resource.getInputStream(), new TypeReference<List<CategoryQuestions>>() {
             });
@@ -64,17 +64,17 @@ public class DataInitializer implements ApplicationRunner {
         CategoryType categoryType = categoryQuestions.categoryType();
         categoryQuestions.questions().forEach(questionWithOptions -> {
 
-          Question question = Question.builder()
+          ChoiceQuestion choiceQuestion = ChoiceQuestion.builder()
               .content(questionWithOptions.question())
               .categoryType(categoryType)
               .options(createOptionsForQuestion(questionWithOptions.options()))
               .build();
 
-          allQuestions.add(question);
+          allChoiceQuestions.add(choiceQuestion);
         });
       });
 
-      questionJdbcRepository.batchInsert(allQuestions);
+      choiceQuestionJdbcRepository.batchInsert(allChoiceQuestions);
     }
   }
 
