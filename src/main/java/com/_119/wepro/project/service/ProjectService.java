@@ -96,7 +96,7 @@ public class ProjectService {
       ProjectMember projectMember = ProjectMember.builder()
           .project(project)
           .member(member)
-          .role(MEMBER.name())
+          .role(MEMBER)
           .build();
 
       projectMemberRepository.save(projectMember);
@@ -145,7 +145,7 @@ public class ProjectService {
     ProjectMember projectMember = ProjectMember.builder()
         .project(project)
         .member(member)
-        .role("member")
+        .role(MEMBER)
         .build();
 
     projectMemberRepository.save(projectMember);

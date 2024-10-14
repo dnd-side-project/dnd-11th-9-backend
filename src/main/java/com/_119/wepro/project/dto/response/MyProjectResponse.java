@@ -22,4 +22,13 @@ public class MyProjectResponse {
     this.memberNum = memberNum;
     this.reviewCompleteCount = 0L;
   }
+
+  public MyProjectResponse(Long id, String name, Integer memberNum, String imgUrl
+  ) {
+    this.id = id;
+    this.name = name;
+    this.imgUrl = imgUrl;
+    this.memberNum = memberNum;
+    this.reviewCompleteCount = 0L;
+  }
 }

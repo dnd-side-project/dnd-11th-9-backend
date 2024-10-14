@@ -35,24 +35,13 @@ public class ProjectCustomRepository {
         .select(Projections.constructor(MyProjectResponse.class,
             project.id,
             project.name,
-            project.memberNum))
+            project.memberNum,
+            JPAExpressions.select(image.url).from(image).where(image.project.id.eq(project.id))
+                .orderBy(image.createdAt.asc()).limit(1)))
         .from(project)
         .join(projectMember).on(project.id.eq(projectMember.project.id))
         .where(projectMember.member.id.eq(memberId))
         .fetch();
-
-    // 각 프로젝트에 대해 가장 오래된 이미지를 가져오는 쿼리를 개별적으로 실행
-    projects.forEach(projectResponse -> {
-      String oldestImageUrl = queryFactory
-          .select(image.url)
-          .from(image)
-          .where(image.project.id.eq(projectResponse.getId()))
-          .orderBy(image.createdAt.asc())
-          .limit(1)
-          .fetchOne();
-
-      projectResponse.setImgUrl(oldestImageUrl);  // 프로젝트에 이미지 URL 설정
-    });
 
     return projects;
   }
