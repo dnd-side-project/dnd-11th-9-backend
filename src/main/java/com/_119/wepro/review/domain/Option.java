@@ -20,12 +20,18 @@ public class Option {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     Option option = (Option) o;
 
-    if (id != null ? !id.equals(option.id) : option.id != null) return false;
+    if (id != null ? !id.equals(option.id) : option.id != null) {
+      return false;
+    }
     return content != null ? content.equals(option.content) : option.content == null;
   }
 

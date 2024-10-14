@@ -13,14 +13,18 @@ import com._119.wepro.project.domain.ProjectMember;
 import com._119.wepro.project.domain.repository.ProjectMemberCustomRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.ReviewForm;
+import com._119.wepro.review.domain.ReviewRecord;
 import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
+import com._119.wepro.review.domain.repository.ReviewRecordRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewDraftRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ProjectMemberGetResponse;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,7 @@ public class ReviewService {
   private final ProjectRepository projectRepository;
   private final ChoiceQuestionRepository choiceQuestionRepository;
   private final ProjectMemberCustomRepository projectMemberCustomRepository;
+  private final ReviewRecordRepository reviewRecordRepository;
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request,
@@ -81,5 +86,24 @@ public class ReviewService {
         reviewFormId);
 
     return ProjectMemberGetResponse.of(filteredMembers);
+  }
+
+  @Transactional
+  public void draft(Long memberId, Long reviewFormId, ReviewDraftRequest request) {
+    Member writer = memberRepository.findById(memberId)
+        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+
+    ReviewForm reviewForm = reviewFormRepository.findById(reviewFormId)
+        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+
+    Optional<ReviewRecord> savedReviewRecord = reviewRecordRepository.findByReviewForm(reviewForm);
+
+    if (savedReviewRecord.isPresent()) { // 첫 번째 이후의 임시저장
+      ReviewRecord reviewRecord = savedReviewRecord.get();
+      reviewRecord.update(request);
+    } else { // 첫 번재 임시저장
+      ReviewRecord reviewRecord = ReviewRecord.of(writer, reviewForm, request);
+      reviewRecordRepository.save(reviewRecord);
+    }
   }
 }
