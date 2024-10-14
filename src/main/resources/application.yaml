@@ -15,6 +15,19 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+
+  thymeleaf:
+    cache: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   security:
     debug: true
     oauth2:
@@ -36,21 +49,38 @@ spring:
             user-name-attribute: sub
             jwk-set-uri: https://kauth.kakao.com/.well-known/jwks.json
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
+
 
 jwt:
   secret: ${jwt.secret}
 
+logging:
+  level:
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.client: DEBUG
+    org.springframework.security.oauth2.core: DEBUG
 
 app:
   cors:
-    allowedOrigins: http://localhost:8081
+    allowedOrigins: http://localhost:3000
 
 server:
   servlet:
     session:
       cookie:
         same-site: Lax    # 크로스 도메인 세션 유지
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${aws.accessKey}
+      secretKey: ${aws.secretKey}
+    s3:
+      bucket: wepro1
+      folder: profile/
+    region:
+      static: "ap-northeast-2"
+    stack:
+      auto: false
+

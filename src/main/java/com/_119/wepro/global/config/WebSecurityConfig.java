@@ -7,6 +7,7 @@ import com._119.wepro.global.filter.JwtTokenFilter;
 import com._119.wepro.global.handler.CustomLogoutHandler;
 import com._119.wepro.global.handler.CustomLogoutSuccessHandler;
 import com._119.wepro.global.security.CustomOidcAuthenticationSuccessHandler;
+import com._119.wepro.global.security.CustomOidcUserService;
 import com._119.wepro.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 public class WebSecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
+  private final CustomOidcUserService customOidcUserService;
   private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
   @Bean
@@ -55,6 +57,7 @@ public class WebSecurityConfig {
             c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(withDefaults())
         .oauth2Login(oauth2Login -> oauth2Login
+                .userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                 .failureHandler(customAuthenticationFailureHandler)
                 .successHandler(customOidcAuthenticationSuccessHandler())
         )

@@ -1,9 +1,6 @@
 package com._119.wepro.global.security;
 
-import static com._119.wepro.global.security.constant.SecurityConstants.*;
-
 import com._119.wepro.global.dto.TokenInfo;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
