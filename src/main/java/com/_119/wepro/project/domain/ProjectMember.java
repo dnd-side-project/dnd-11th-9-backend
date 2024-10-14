@@ -26,6 +26,15 @@ public class ProjectMember {
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  @Column(nullable = false, length = 11)
-  private String role;
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private ProjectMemberType role;
+
+  public static ProjectMember of(Project project, Member member, String role) {
+    return ProjectMember.builder()
+        .project(project)
+        .member(member)
+        .role(ProjectMemberType.valueOf(role))
+        .build();
+  }
 }

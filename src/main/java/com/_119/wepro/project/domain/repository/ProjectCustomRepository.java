@@ -23,7 +23,7 @@ public class ProjectCustomRepository {
 
   public List<Project> searchProjects(String keyword) {
     return queryFactory.select(project).from(project)
-        .where(project.tag.contains(keyword).or(project.name.contains(keyword))).fetch();
+        .where(project.tag.contains(keyword).or(project.name.contains(keyword))).limit(10).fetch();
   }
 
   public List<MyProjectResponse> getMyProjects(Long memberId) {

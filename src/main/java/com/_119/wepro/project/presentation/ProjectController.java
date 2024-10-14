@@ -195,9 +195,10 @@ public class ProjectController {
           )
       )
   )
-  public ResponseEntity<Void> addMember(@RequestBody ProjectMemberCreateRequest dto,
+  public ResponseEntity<Void> addMember(
+      @RequestBody ProjectMemberCreateRequest projectMemberCreateRequest,
       @PathVariable("id") Long id) {
-    projectService.addProjectMember(dto.getMemberId(), id);
+    projectService.addProjectMember(projectMemberCreateRequest.getMemberId(), id);
     return ResponseEntity.ok(null);
   }
 }

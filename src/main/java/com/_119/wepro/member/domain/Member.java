@@ -63,6 +63,9 @@ public class Member extends BaseEntity {
   @OneToMany(mappedBy = "member")
   private Set<ProjectMember> projectMembers;
 
+  @Column(nullable = false)
+  private Boolean receiveAlarm = false;
+
   // 엔티티가 저장된 후 id로 태그를 생성합니다.
   //todo 태그 저장안되는 이슈 확인하기
   @PostPersist

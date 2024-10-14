@@ -57,7 +57,6 @@ public class ProjectService {
   @Transactional
   public Long createProject(ProjectCreateRequest projectCreateRequest, Long projectCreatorId) {
     Project newProject = Project.of(projectCreateRequest);
-    projectRepository.save(newProject);
 
     // 팀원 멤버 역할로 등록
     for (Long memberId : projectCreateRequest.getMemberList()) {
@@ -111,11 +110,7 @@ public class ProjectService {
     Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new RestApiException(PROJECT_MEMBER_NOT_FOUND));
 
-    ProjectMember projectMember = ProjectMember.builder()
-        .project(project)
-        .member(member)
-        .role(role)
-        .build();
+    ProjectMember projectMember = ProjectMember.of(project, member, role);
 
     projectMemberRepository.save(projectMember);
 

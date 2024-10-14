@@ -16,6 +16,7 @@ public class MemberCustomRepository {
 
   public List<Member> findMembers(String keyword) {
     return queryFactory.select(member).from(member)
-        .where(member.tag.contains(keyword).or(member.profile.name.contains(keyword))).fetch();
+        .where(member.tag.contains(keyword).or(member.profile.name.contains(keyword))).limit(10)
+        .fetch();
   }
 }
