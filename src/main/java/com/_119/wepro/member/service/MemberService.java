@@ -4,6 +4,7 @@ import static com._119.wepro.global.exception.errorcode.UserErrorCode.USER_NOT_F
 
 import com._119.wepro.global.exception.RestApiException;
 import com._119.wepro.member.domain.Member;
+import com._119.wepro.member.domain.MemberRole;
 import com._119.wepro.member.domain.Profile;
 import com._119.wepro.member.domain.repository.MemberCustomRepository;
 import com._119.wepro.member.domain.repository.MemberRepository;
@@ -36,7 +37,9 @@ public class MemberService {
         .orElseThrow(() -> new RestApiException(USER_NOT_FOUND));
 
     member.setPosition(dto.getPosition());
-
+    if (member.getRole().equals(MemberRole.GUEST)) {
+      member.setRole(MemberRole.USER);
+    }
     memberRepository.save(member);
   }
 
