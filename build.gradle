@@ -86,3 +86,10 @@ jar {
 clean {
     delete file('src/main/generated')
 }
+
+test {
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+    }
+}
