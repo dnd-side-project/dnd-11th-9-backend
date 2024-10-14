@@ -12,6 +12,7 @@ public class OptionDto {
 
   private Long optionId;
   private String content;
+  private Integer score;
 
   public static OptionDto ofWithoutId(Option option) {
     return OptionDto.builder()

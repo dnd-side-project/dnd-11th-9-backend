@@ -107,13 +107,16 @@ public class DataInitializer implements ApplicationRunner {
 
   private List<Option> createOptionsForQuestion(List<String> optionTexts) {
     List<Option> options = new ArrayList<>();
-    for (int i = 0; i < optionTexts.size(); i++) {
+    Integer score = optionTexts.size();
+
+    for (String optionText : optionTexts) {
       options.add(Option.builder()
           .id(optionIdCounter.getAndIncrement())
-          .content(optionTexts.get(i))
+          .score(score--)
+          .content(optionText)
           .build());
     }
-    return options;
+      return options;
   }
 
   private record CategoryQuestions(CategoryType categoryType, List<QuestionWithOptions> questions) {

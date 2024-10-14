@@ -16,6 +16,8 @@ public class Option {
 
   private String content;
 
+  private Integer score;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
