@@ -17,8 +17,11 @@ import com._119.wepro.member.domain.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReissueService {
@@ -31,15 +34,14 @@ public class ReissueService {
     String refreshToken = request.getHeader(REFRESH_TOKEN_HEADER);
     String accessToken = extractToken(request.getHeader(ACCESS_TOKEN_HEADER));
 
-    validateAccessTokenExpired(accessToken);
-    String providerId = jwtTokenProvider.parseExpiredToken(accessToken).getSubject();
+    String memberId = jwtTokenProvider.parseExpiredToken(accessToken).getSubject();
 
-    validateRefreshToken(refreshToken, providerId);
+    validateRefreshToken(refreshToken, memberId);
 
-    Member member = memberRepository.findByProviderId(providerId)
+    Member member = memberRepository.findById(Long.parseLong(memberId))
         .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
 
-    TokenInfo newTokenInfo = jwtTokenProvider.generateToken(providerId, member.getRole());
+    TokenInfo newTokenInfo = jwtTokenProvider.generateToken(memberId, member.getRole());
     setTokenPairToResponseHeader(response, newTokenInfo.getAccessToken(),
         newTokenInfo.getRefreshToken());
   }
@@ -52,17 +54,6 @@ public class ReissueService {
     return token.replace(GRANT_TYPE, "");
   }
 
-  private void validateAccessTokenExpired(String accessToken) {
-    try {
-      jwtTokenProvider.validateToken(accessToken);
-      throw new RestApiException(REFRESH_DENIED);
-    } catch (RestApiException e) {
-      if (e.getErrorCode() != EXPIRED_TOKEN) {
-        throw e;
-      }
-    }
-  }
-
   private void validateRefreshToken(String refreshToken, String memberId) {
     String savedRefreshToken = jwtTokenProvider.getRefreshToken(memberId);
     if (!refreshToken.equals(savedRefreshToken)) {
@@ -73,6 +64,6 @@ public class ReissueService {
   private void setTokenPairToResponseHeader(
       HttpServletResponse response, String accessToken, String refreshToken) {
     response.setHeader(ACCESS_TOKEN_HEADER, GRANT_TYPE + accessToken);
-    response.setHeader(REFRESH_TOKEN_HEADER, GRANT_TYPE + refreshToken);
+    response.setHeader(REFRESH_TOKEN_HEADER,  refreshToken);
   }
 }

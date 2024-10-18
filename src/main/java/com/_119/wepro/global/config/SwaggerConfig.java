@@ -1,5 +1,7 @@
 package com._119.wepro.global.config;
 
+import static com._119.wepro.global.security.constant.SecurityConstants.REFRESH_TOKEN_HEADER;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -8,7 +10,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
 @Configuration
 public class SwaggerConfig {
@@ -48,7 +49,7 @@ public class SwaggerConfig {
     return new SecurityScheme()
         .type(SecurityScheme.Type.APIKEY)
         .in(SecurityScheme.In.HEADER)
-        .name(AuthorizationGrantType.REFRESH_TOKEN.getValue());
+        .name(REFRESH_TOKEN_HEADER);
   }
 
   private Info createApiInfo() {
