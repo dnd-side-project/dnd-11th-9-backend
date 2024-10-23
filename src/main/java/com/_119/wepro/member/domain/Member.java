@@ -63,7 +63,7 @@ public class Member extends BaseEntity {
   @OneToMany(mappedBy = "member")
   private Set<ProjectMember> projectMembers;
 
-  @Column(nullable = false)
+  @Builder.Default
   private Boolean receiveAlarm = false;
 
   // 엔티티가 저장된 후 id로 태그를 생성합니다.

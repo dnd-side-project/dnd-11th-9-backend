@@ -34,7 +34,7 @@ import org.springframework.util.StringUtils;
 public class JwtTokenProvider {
 
   private static final long ACCESS_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // TODO: 임시 7일
-  private static final long REFRESH_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 7; // 7일
+  private static final long REFRESH_TOKEN_DURATION = 1000 * 60 * 60L * 24 * 14; // 14일
 
   private final RedisUtil redisUtil;
   private final SecretKey secretKey;
