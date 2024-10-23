@@ -18,7 +18,7 @@ import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.domain.repository.ReviewRecordRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
-import com._119.wepro.review.dto.request.ReviewRequest.ReviewDraftRequest;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ProjectMemberGetResponse;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
@@ -44,17 +44,17 @@ public class ReviewService {
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request,
-      Long memberId) {
+    Long memberId) {
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
     Project project = projectRepository.findById(request.getProjectId())
-        .orElseThrow(() -> new RestApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
 
     List<Long> questionIdList = request.getQuestionIdList();
     questionIdList.stream()
-        .map(id -> choiceQuestionRepository.findById(id)
-            .orElseThrow(() -> new RestApiException(ReviewErrorCode.QUESTION_NOT_FOUND)))
-        .toList();
+      .map(id -> choiceQuestionRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(ReviewErrorCode.QUESTION_NOT_FOUND)))
+      .toList();
 
     // 리뷰 폼 생성 및 저장
     ReviewForm reviewForm = ReviewForm.of(member, project, questionIdList);
@@ -65,36 +65,36 @@ public class ReviewService {
 
   public void requestReview(ReviewAskRequest request, Long memberId) {
     Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
 
     List<Long> memberIdList = request.getMemberIdList();
     memberIdList.stream()
-        .map(id -> memberRepository.findById(id)
-            .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND)))
-        .toList();
+      .map(id -> memberRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND)))
+      .toList();
 
     memberIdList.forEach(reviewerId ->
-        alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
-            request.getReviewFormId())
+      alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
+        request.getReviewFormId())
     );
   }
 
   public ProjectMemberGetResponse getProjectMembers(Long reviewFormId) {
     reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
     List<ProjectMember> filteredMembers = projectMemberCustomRepository.getProjectMembersWithoutReviewRequest(
-        reviewFormId);
+      reviewFormId);
 
     return ProjectMemberGetResponse.of(filteredMembers);
   }
 
   @Transactional
-  public void draft(Long memberId, Long reviewFormId, ReviewDraftRequest request) {
+  public void draft(Long memberId, Long reviewFormId, ReviewSaveRequest request) {
     Member writer = memberRepository.findById(memberId)
-        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
 
     ReviewForm reviewForm = reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+      .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
 
     Optional<ReviewRecord> savedReviewRecord = reviewRecordRepository.findByReviewForm(reviewForm);
 
@@ -105,5 +105,31 @@ public class ReviewService {
       ReviewRecord reviewRecord = ReviewRecord.of(writer, reviewForm, request);
       reviewRecordRepository.save(reviewRecord);
     }
+  }
+
+  @Transactional
+  public void submitReview(Long memberId, Long reviewFormId, ReviewSaveRequest request) {
+    Member writer = memberRepository.findById(memberId)
+      .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+
+    ReviewForm reviewForm = reviewFormRepository.findById(reviewFormId)
+      .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+
+    ReviewRecord reviewRecord = reviewRecordRepository.findByReviewForm(reviewForm)
+      .map(savedRecord -> {
+        if (!savedRecord.getIsDraft()) {
+          throw new RestApiException(ReviewErrorCode.ALREADY_SUBMITTED);
+        }
+        savedRecord.update(request);
+        savedRecord.submit();
+        return savedRecord;
+      })
+      .orElseGet(() -> {
+        ReviewRecord newRecord = ReviewRecord.of(writer, reviewForm, request);
+        newRecord.submit();
+        return newRecord;
+      });
+
+    reviewRecordRepository.save(reviewRecord);
   }
 }

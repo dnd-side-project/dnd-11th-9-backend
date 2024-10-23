@@ -29,7 +29,7 @@ public class ReviewRequest {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ReviewAskRequest{
+  public static class ReviewAskRequest {
 
     @NotNull
     private Long reviewFormId;
@@ -42,7 +42,7 @@ public class ReviewRequest {
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ReviewDraftRequest{
+  public static class ReviewSaveRequest {
 
     @NotNull
     private List<ChoiceAnswerDto> choiceAnswerList;

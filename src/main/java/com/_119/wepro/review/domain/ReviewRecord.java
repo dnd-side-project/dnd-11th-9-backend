@@ -4,7 +4,7 @@ import com._119.wepro.global.BaseEntity;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.review.domain.converter.ChoiceAnswerConverter;
 import com._119.wepro.review.domain.converter.SubAnswerConverter;
-import com._119.wepro.review.dto.request.ReviewRequest.ReviewDraftRequest;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -64,7 +64,7 @@ public class ReviewRecord extends BaseEntity {
   @Convert(converter = SubAnswerConverter.class)
   private List<SubAnswer> subAnswers;
 
-  public static ReviewRecord of(Member writer, ReviewForm reviewForm, ReviewDraftRequest request) {
+  public static ReviewRecord of(Member writer, ReviewForm reviewForm, ReviewSaveRequest request) {
     List<ChoiceAnswer> choiceAnswers = request.getChoiceAnswerList().stream()
         .map(ChoiceAnswer::of)
         .toList();
@@ -82,7 +82,7 @@ public class ReviewRecord extends BaseEntity {
         .build();
   }
 
-  public void update(ReviewDraftRequest request) {
+  public void update(ReviewSaveRequest request) {
     List<ChoiceAnswer> choiceAnswers = request.getChoiceAnswerList().stream()
         .map(ChoiceAnswer::of)
         .toList();
@@ -93,5 +93,9 @@ public class ReviewRecord extends BaseEntity {
 
     this.choiceAnswers = choiceAnswers;
     this.subAnswers = subAnswers;
+  }
+
+  public void submit(){
+    this.isDraft = false;
   }
 }
