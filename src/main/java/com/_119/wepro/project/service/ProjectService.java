@@ -58,8 +58,6 @@ public class ProjectService {
   public Long createProject(ProjectCreateRequest projectCreateRequest, Long projectCreatorId) {
     Project newProject = Project.of(projectCreateRequest);
 
-    newProject = projectRepository.save(newProject);
-
     // 팀원 멤버 역할로 등록
     for (Long memberId : projectCreateRequest.getMemberList()) {
       registerProjectMember(newProject, memberId, MEMBER.name());
@@ -68,10 +66,9 @@ public class ProjectService {
     // 팀장 등록
     registerProjectMember(newProject, projectCreatorId, TEAM_LEADER.name());
 
-    Project finalNewProject = newProject;
     newProject.setImageList(
         projectCreateRequest.getImgUrls().stream()
-            .map(imgUrl -> Image.of(imgUrl, finalNewProject))
+            .map(imgUrl -> Image.of(imgUrl, newProject))
             .collect(Collectors.toList())
     );
 
@@ -115,9 +112,7 @@ public class ProjectService {
 
     ProjectMember projectMember = ProjectMember.of(project, member, role);
 
-    projectMemberRepository.save(projectMember);
-
-    // 멤버 수 증가
+    project.getProjectMembers().add(projectMember);
     project.setMemberNum(project.getMemberNum() + 1);
   }
 

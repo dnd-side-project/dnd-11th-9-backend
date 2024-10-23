@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PostPersist;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -68,6 +69,7 @@ public class Project {
         .endDate(projectCreateRequest.getEndDate())
         .info(projectCreateRequest.getDesc())
         .memberNum(0)
+        .projectMembers(new HashSet<>())
         .link(projectCreateRequest.getLink())
         .build();
   }
