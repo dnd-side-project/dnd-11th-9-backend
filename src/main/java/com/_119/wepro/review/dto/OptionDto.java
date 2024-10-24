@@ -14,15 +14,17 @@ public class OptionDto {
   private String content;
   private Integer score;
 
-  public static OptionDto ofWithoutId(Option option) {
-    return OptionDto.builder()
-        .content(option.getContent())
-        .build();
+  public static OptionDto of(Option option) {
+    return create(option, false);
   }
 
   public static OptionDto ofWithId(Option option) {
+    return create(option, true);
+  }
+
+  private static OptionDto create(Option option, boolean includeId) {
     return OptionDto.builder()
-        .optionId(option.getId())
+        .optionId(includeId ? option.getId() : null)
         .content(option.getContent())
         .build();
   }

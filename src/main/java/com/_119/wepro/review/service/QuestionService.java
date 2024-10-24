@@ -33,39 +33,43 @@ public class QuestionService {
   public QuestionInCategoriesGetResponse getQuestionsInCategories(
       List<CategoryType> categoryTypes) {
 
-    List<ChoiceQuestion> choiceQuestions = categoryTypes.stream()
-        .flatMap(category -> choiceQuestionRepository.findByCategoryType(category).stream())
-        .toList();
-    if (choiceQuestions.isEmpty()) {
-      throw new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY);
-    }
-
+    List<ChoiceQuestion> choiceQuestions = findChoiceQuestionsByCategories(categoryTypes);
     return QuestionInCategoriesGetResponse.of(choiceQuestions);
   }
 
   public QuestionInReviewFormGetResponse getQuestionsInReviewForm(Long reviewFormId) {
 
-    ReviewForm reviewForm = reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
-
+    ReviewForm reviewForm = findReviewFormById(reviewFormId);
     Optional<ReviewRecord> reviewRecord = reviewRecordRepository.findByReviewForm(reviewForm);
-
     validateReviewForm(reviewForm, reviewRecord);
 
-    // 리뷰 받는 유저의 이름
-    String userName = reviewForm.getMember().getProfile().getName();
-
+    String revieweeName = reviewForm.getMember().getProfile().getName();
     List<ChoiceQuestion> choiceQuestions = choiceQuestionCustomRepository.findAllByIds(
         reviewForm.getQuestionIdList());
     List<SubQuestion> subQuestions = subQuestionRepository.findAllByOrderByIdAsc();
 
-    return reviewRecord.map(
-            record -> QuestionInReviewFormGetResponse.ofWithReviewRecord(userName, choiceQuestions,
-                subQuestions, record))
-        .orElseGet(() -> QuestionInReviewFormGetResponse.of(userName, choiceQuestions, subQuestions));
+    return createResponseFromRecord(revieweeName, choiceQuestions, subQuestions, reviewRecord);
+  }
+
+  private List<ChoiceQuestion> findChoiceQuestionsByCategories(List<CategoryType> categoryTypes) {
+
+    return categoryTypes.stream()
+        .flatMap(category -> choiceQuestionRepository.findByCategoryType(category)
+            .filter(questions -> !questions.isEmpty())
+            .orElseThrow(
+                () -> new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY))
+            .stream())
+        .toList();
+  }
+
+  private ReviewForm findReviewFormById(Long reviewFormId) {
+
+    return reviewFormRepository.findById(reviewFormId)
+        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
   }
 
   private void validateReviewForm(ReviewForm reviewForm, Optional<ReviewRecord> reviewRecord) {
+
     if (reviewForm.getDueDate().isBefore(LocalDate.now())) {
       throw new RestApiException(ReviewErrorCode.REVIEW_FORM_EXPIRED);
     }
@@ -74,4 +78,14 @@ public class QuestionService {
     }
   }
 
+  private QuestionInReviewFormGetResponse createResponseFromRecord(String revieweeName,
+      List<ChoiceQuestion> choiceQuestions, List<SubQuestion> subQuestions,
+      Optional<ReviewRecord> reviewRecord) {
+
+    return reviewRecord
+        .map(record -> QuestionInReviewFormGetResponse
+            .ofWithReviewRecord(revieweeName, choiceQuestions, subQuestions, record))
+        .orElseGet(
+            () -> QuestionInReviewFormGetResponse.of(revieweeName, choiceQuestions, subQuestions));
+  }
 }

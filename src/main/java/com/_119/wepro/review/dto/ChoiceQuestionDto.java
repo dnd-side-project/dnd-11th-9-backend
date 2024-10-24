@@ -17,35 +17,29 @@ public class ChoiceQuestionDto {
   private List<OptionDto> options;
   private Long answerOptionId;
 
-  public static ChoiceQuestionDto ofWithoutOptionId(ChoiceQuestion choiceQuestion) {
-    return ChoiceQuestionDto.builder()
-        .questionId(choiceQuestion.getId())
-        .question(choiceQuestion.getContent())
-        .options(choiceQuestion.getOptions().stream()
-            .map(OptionDto::ofWithoutId)
-            .toList())
-        .build();
+  public static ChoiceQuestionDto of(ChoiceQuestion choiceQuestion) {
+    return create(choiceQuestion, false, null);
   }
 
   public static ChoiceQuestionDto ofWithOptionId(ChoiceQuestion choiceQuestion) {
-    return ChoiceQuestionDto.builder()
-        .questionId(choiceQuestion.getId())
-        .question(choiceQuestion.getContent())
-        .options(choiceQuestion.getOptions().stream()
-            .map(OptionDto::ofWithId)
-            .toList())
-        .build();
+    return create(choiceQuestion, true, null);
   }
 
   public static ChoiceQuestionDto ofWithAnswer(ChoiceQuestion choiceQuestion, ChoiceAnswer answer) {
+    return create(choiceQuestion, true, answer);
+  }
+
+  private static ChoiceQuestionDto create(ChoiceQuestion choiceQuestion, boolean includeOptionId,
+      ChoiceAnswer answer) {
+    List<OptionDto> optionDtos = choiceQuestion.getOptions().stream()
+        .map(option -> includeOptionId ? OptionDto.ofWithId(option) : OptionDto.of(option))
+        .toList();
+
     return ChoiceQuestionDto.builder()
         .questionId(choiceQuestion.getId())
         .question(choiceQuestion.getContent())
-        .options(choiceQuestion.getOptions().stream()
-            .map(OptionDto::ofWithId)
-            .toList())
-        .answerOptionId(answer.getOptionId())
+        .options(optionDtos)
+        .answerOptionId(answer != null ? answer.getOptionId() : null)
         .build();
   }
 }
-

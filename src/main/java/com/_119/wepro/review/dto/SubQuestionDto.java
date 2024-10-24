@@ -16,17 +16,18 @@ public class SubQuestionDto {
   private String answer;
 
   public static SubQuestionDto of(SubQuestion subQuestion) {
-    return SubQuestionDto.builder()
-        .questionId(subQuestion.getId())
-        .content(subQuestion.getContent())
-        .build();
+    return create(subQuestion, null);
   }
 
   public static SubQuestionDto ofWithAnswer(SubQuestion subQuestion, SubAnswer subAnswer) {
+    return create(subQuestion, subAnswer);
+  }
+
+  private static SubQuestionDto create(SubQuestion subQuestion, SubAnswer subAnswer) {
     return SubQuestionDto.builder()
         .questionId(subQuestion.getId())
         .content(subQuestion.getContent())
-        .answer(subAnswer.getAnswerText())
+        .answer(subAnswer != null ? subAnswer.getAnswerText() : null)
         .build();
   }
 }
