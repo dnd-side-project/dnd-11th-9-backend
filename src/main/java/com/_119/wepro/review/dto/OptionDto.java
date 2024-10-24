@@ -12,9 +12,19 @@ public class OptionDto {
 
   private Long optionId;
   private String content;
+  private Integer score;
 
-  public static OptionDto ofWithoutId(Option option) {
+  public static OptionDto of(Option option) {
+    return create(option, false);
+  }
+
+  public static OptionDto ofWithId(Option option) {
+    return create(option, true);
+  }
+
+  private static OptionDto create(Option option, boolean includeId) {
     return OptionDto.builder()
+        .optionId(includeId ? option.getId() : null)
         .content(option.getContent())
         .build();
   }
