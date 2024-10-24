@@ -2,7 +2,10 @@ package com._119.wepro.project.domain;
 
 import com._119.wepro.global.BaseEntity;
 import com._119.wepro.member.domain.Member;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,10 +30,22 @@ public class ProjectMember extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
-  private Member member;
+  @JoinColumn(name = "project_id", nullable = false)
+  private Project project;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "project_id")
-  private Project project;
+  @JoinColumn(name = "member_id", nullable = false)
+  private Member member;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private ProjectMemberType role;
+
+  public static ProjectMember of(Project project, Member member, String role) {
+    return ProjectMember.builder()
+        .project(project)
+        .member(member)
+        .role(ProjectMemberType.valueOf(role))
+        .build();
+  }
 }
