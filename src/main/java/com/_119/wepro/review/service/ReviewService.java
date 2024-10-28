@@ -15,6 +15,9 @@ import com._119.wepro.review.domain.ReviewRecord;
 import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.domain.repository.ReviewRecordRepository;
+import com._119.wepro.review.domain.repository.SubQuestionRepository;
+import com._119.wepro.review.dto.ChoiceAnswerDto;
+import com._119.wepro.review.dto.SubAnswerDto;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
@@ -38,6 +41,7 @@ public class ReviewService {
   private final ChoiceQuestionRepository choiceQuestionRepository;
   private final ProjectMemberCustomRepository projectMemberCustomRepository;
   private final ReviewRecordRepository reviewRecordRepository;
+  private final SubQuestionRepository subQuestionRepository;
 
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request, Long memberId) {
@@ -74,8 +78,11 @@ public class ReviewService {
 
     Member writer = memberRepository.findByIdOrThrow(memberId);
     ReviewForm reviewForm = reviewFormRepository.findByIdOrThrow(reviewFormId);
-    ReviewRecord reviewRecord = getOrCreateReviewRecord(writer, reviewForm, request);
 
+    validateChoiceQuestionAndOptionIds(request.getChoiceAnswerList());
+    validateSubQuestionIds(request.getSubAnswerList());
+
+    ReviewRecord reviewRecord = getOrCreateReviewRecord(writer, reviewForm, request);
     reviewRecordRepository.save(reviewRecord);
   }
 
@@ -84,9 +91,12 @@ public class ReviewService {
 
     Member writer = memberRepository.findByIdOrThrow(memberId);
     ReviewForm reviewForm = reviewFormRepository.findByIdOrThrow(reviewFormId);
+
+    validateChoiceQuestionAndOptionIds(request.getChoiceAnswerList());
+    validateSubQuestionIds(request.getSubAnswerList());
+
     ReviewRecord reviewRecord = getOrCreateReviewRecord(writer, reviewForm, request);
     reviewRecord.submit();
-
     reviewRecordRepository.save(reviewRecord);
   }
 
@@ -108,6 +118,19 @@ public class ReviewService {
     if (!savedRecord.getIsDraft()) {
       throw new RestApiException(ReviewErrorCode.ALREADY_SUBMITTED);
     }
+  }
+
+  private void validateChoiceQuestionAndOptionIds(List<ChoiceAnswerDto> choiceAnswerList) {
+    choiceAnswerList.forEach(answer -> {
+      choiceQuestionRepository.findByIdOrThrow(answer.getQuestionId());
+      choiceQuestionRepository.findOptionByIdOrThrow(answer.getQuestionId(), answer.getOptionId());
+    });
+  }
+
+  private void validateSubQuestionIds(List<SubAnswerDto> subAnswerList) {
+    subAnswerList.forEach(answer ->
+        subQuestionRepository.findByIdOrThrow(answer.getQuestionId())
+    );
   }
 
   private void validateQuestionIds(List<Long> questionIdList) {
