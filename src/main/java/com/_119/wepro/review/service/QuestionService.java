@@ -16,7 +16,9 @@ import com._119.wepro.review.dto.response.QuestionResponse.QuestionInCategoriesG
 import com._119.wepro.review.dto.response.QuestionResponse.QuestionInReviewFormGetResponse;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +35,9 @@ public class QuestionService {
   public QuestionInCategoriesGetResponse getQuestionsInCategories(
       List<CategoryType> categoryTypes) {
 
-    List<ChoiceQuestion> choiceQuestions = findChoiceQuestionsByCategories(categoryTypes);
-    return QuestionInCategoriesGetResponse.of(choiceQuestions);
+    Map<CategoryType, List<ChoiceQuestion>> groupedChoiceQuestions = findChoiceQuestionsByCategories(
+        categoryTypes);
+    return QuestionInCategoriesGetResponse.of(groupedChoiceQuestions);
   }
 
   public QuestionInReviewFormGetResponse getQuestionsInReviewForm(Long reviewFormId) {
@@ -51,15 +54,17 @@ public class QuestionService {
     return createResponseFromRecord(revieweeName, choiceQuestions, subQuestions, reviewRecord);
   }
 
-  private List<ChoiceQuestion> findChoiceQuestionsByCategories(List<CategoryType> categoryTypes) {
+  private Map<CategoryType, List<ChoiceQuestion>> findChoiceQuestionsByCategories(
+      List<CategoryType> categoryTypes) {
 
     return categoryTypes.stream()
-        .flatMap(category -> choiceQuestionRepository.findByCategoryType(category)
-            .filter(questions -> !questions.isEmpty())
-            .orElseThrow(
-                () -> new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY))
-            .stream())
-        .toList();
+        .collect(Collectors.toMap(
+            category -> category,
+            category -> choiceQuestionRepository.findByCategoryType(category)
+                .filter(questions -> !questions.isEmpty())
+                .orElseThrow(
+                    () -> new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY))
+        ));
   }
 
   private ReviewForm findReviewFormById(Long reviewFormId) {

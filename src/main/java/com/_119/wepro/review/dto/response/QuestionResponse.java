@@ -22,10 +22,8 @@ public class QuestionResponse {
 
     private List<QuestionInCategoryDto> allQuestions;
 
-    public static QuestionInCategoriesGetResponse of(List<ChoiceQuestion> choiceQuestions) {
-      Map<CategoryType, List<ChoiceQuestion>> groupedQuestions = choiceQuestions.stream()
-          .collect(Collectors.groupingBy(ChoiceQuestion::getCategoryType));
-
+    public static QuestionInCategoriesGetResponse of(
+        Map<CategoryType, List<ChoiceQuestion>> groupedQuestions) {
       List<QuestionInCategoryDto> allQuestions = groupedQuestions.entrySet().stream()
           .map(entry -> QuestionInCategoryDto.ofWithoutOptionId(entry.getKey(), entry.getValue()))
           .toList();
