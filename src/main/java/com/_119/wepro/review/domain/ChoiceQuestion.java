@@ -25,7 +25,7 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Getter
 @Builder
-public class Question extends BaseEntity {
+public class ChoiceQuestion extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
