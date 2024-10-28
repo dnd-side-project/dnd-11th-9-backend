@@ -61,8 +61,8 @@ public class ReviewService {
 
     List<Long> memberIdList = request.getMemberIdList();
     memberIdList.forEach(reviewerId -> {
-      findMemberById(reviewerId);
-      alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST, request.getReviewFormId());
+      alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
+          request.getReviewFormId());
     });
   }
 
@@ -96,17 +96,24 @@ public class ReviewService {
     reviewRecordRepository.save(reviewRecord);
   }
 
-  private ReviewRecord getOrCreateReviewRecord(Member writer, ReviewForm reviewForm, ReviewSaveRequest request) {
+  private ReviewRecord getOrCreateReviewRecord(Member writer, ReviewForm reviewForm,
+      ReviewSaveRequest request) {
 
     return reviewRecordRepository.findByReviewForm(reviewForm)
-        .map(savedRecord -> {
-          if (!savedRecord.getIsDraft()) {
-            throw new RestApiException(ReviewErrorCode.ALREADY_SUBMITTED);
-          }
-          savedRecord.update(request);
-          return savedRecord;
-        })
+        .map(savedRecord -> updateIfDraft(savedRecord, request))
         .orElseGet(() -> ReviewRecord.of(writer, reviewForm, request));
+  }
+
+  private ReviewRecord updateIfDraft(ReviewRecord savedRecord, ReviewSaveRequest request) {
+    checkIfDraft(savedRecord);
+    savedRecord.update(request);
+    return savedRecord;
+  }
+
+  private void checkIfDraft(ReviewRecord savedRecord) {
+    if (!savedRecord.getIsDraft()) {
+      throw new RestApiException(ReviewErrorCode.ALREADY_SUBMITTED);
+    }
   }
 
   private Member findMemberById(Long memberId) {

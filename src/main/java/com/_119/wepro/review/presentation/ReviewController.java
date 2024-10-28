@@ -47,7 +47,7 @@ public class ReviewController {
   @Operation(summary = "리뷰 임시저장 API")
   @PostMapping("/draft/{reviewFormId}")
   public ResponseEntity<Void> draftReview(@PathVariable(name = "reviewFormId") Long reviewFormId,
-      @RequestBody @Valid ReviewRequest.ReviewSaveRequest request) {
+      @RequestBody @Valid ReviewSaveRequest request) {
     Long memberId = securityUtil.getCurrentMemberId();
     reviewService.draft(memberId, reviewFormId, request);
     return ResponseEntity.ok().build();
