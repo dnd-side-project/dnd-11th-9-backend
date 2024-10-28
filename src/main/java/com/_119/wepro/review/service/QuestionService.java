@@ -35,15 +35,16 @@ public class QuestionService {
   public QuestionInCategoriesGetResponse getQuestionsInCategories(
       List<CategoryType> categoryTypes) {
 
-    Map<CategoryType, List<ChoiceQuestion>> groupedChoiceQuestions = findChoiceQuestionsByCategories(
+    Map<CategoryType, List<ChoiceQuestion>> groupedChoiceQuestions = getGroupedQuestionsByCategories(
         categoryTypes);
     return QuestionInCategoriesGetResponse.of(groupedChoiceQuestions);
   }
 
   public QuestionInReviewFormGetResponse getQuestionsInReviewForm(Long reviewFormId) {
 
-    ReviewForm reviewForm = findReviewFormById(reviewFormId);
+    ReviewForm reviewForm = reviewFormRepository.findByIdOrThrow(reviewFormId);
     Optional<ReviewRecord> reviewRecord = reviewRecordRepository.findByReviewForm(reviewForm);
+
     validateReviewForm(reviewForm, reviewRecord);
 
     String revieweeName = reviewForm.getMember().getProfile().getName();
@@ -54,7 +55,7 @@ public class QuestionService {
     return createResponseFromRecord(revieweeName, choiceQuestions, subQuestions, reviewRecord);
   }
 
-  private Map<CategoryType, List<ChoiceQuestion>> findChoiceQuestionsByCategories(
+  private Map<CategoryType, List<ChoiceQuestion>> getGroupedQuestionsByCategories(
       List<CategoryType> categoryTypes) {
 
     return categoryTypes.stream()
@@ -65,12 +66,6 @@ public class QuestionService {
                 .orElseThrow(
                     () -> new RestApiException(ReviewErrorCode.QUESTIONS_NOT_FOUND_FOR_CATEGORY))
         ));
-  }
-
-  private ReviewForm findReviewFormById(Long reviewFormId) {
-
-    return reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
   }
 
   private void validateReviewForm(ReviewForm reviewForm, Optional<ReviewRecord> reviewRecord) {

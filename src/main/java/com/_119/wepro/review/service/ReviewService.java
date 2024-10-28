@@ -3,9 +3,7 @@ package com._119.wepro.review.service;
 import com._119.wepro.alarm.service.AlarmService;
 import com._119.wepro.global.enums.AlarmType;
 import com._119.wepro.global.exception.RestApiException;
-import com._119.wepro.global.exception.errorcode.ProjectErrorCode;
 import com._119.wepro.global.exception.errorcode.ReviewErrorCode;
-import com._119.wepro.global.exception.errorcode.UserErrorCode;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
 import com._119.wepro.project.domain.Project;
@@ -18,13 +16,12 @@ import com._119.wepro.review.domain.repository.ChoiceQuestionRepository;
 import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import com._119.wepro.review.domain.repository.ReviewRecordRepository;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
-import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
+import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
 import com._119.wepro.review.dto.response.ReviewResponse.ProjectMemberGetResponse;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,8 +42,8 @@ public class ReviewService {
   @Transactional
   public ReviewFormCreateResponse createReviewForm(ReviewFormCreateRequest request, Long memberId) {
 
-    Member member = findMemberById(memberId);
-    Project project = findProjectById(request.getProjectId());
+    Member member = memberRepository.findByIdOrThrow(memberId);
+    Project project = projectRepository.findByIdOrThrow(request.getProjectId());
     validateQuestionIds(request.getQuestionIdList());
 
     ReviewForm reviewForm = ReviewForm.of(member, project, request.getQuestionIdList());
@@ -57,18 +54,15 @@ public class ReviewService {
 
   public void requestReview(ReviewAskRequest request, Long memberId) {
 
-    Member member = findMemberById(memberId);
-
-    List<Long> memberIdList = request.getMemberIdList();
-    memberIdList.forEach(reviewerId -> {
+    Member member = memberRepository.findByIdOrThrow(memberId);
+    request.getMemberIdList().forEach(reviewerId -> {
       alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
           request.getReviewFormId());
     });
   }
 
   public ProjectMemberGetResponse getProjectMembers(Long reviewFormId) {
-    reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
+    reviewFormRepository.findByIdOrThrow(reviewFormId);
     List<ProjectMember> filteredMembers = projectMemberCustomRepository.getProjectMembersWithoutReviewRequest(
         reviewFormId);
 
@@ -78,8 +72,8 @@ public class ReviewService {
   @Transactional
   public void draft(Long memberId, Long reviewFormId, ReviewSaveRequest request) {
 
-    Member writer = findMemberById(memberId);
-    ReviewForm reviewForm = findReviewFormById(reviewFormId);
+    Member writer = memberRepository.findByIdOrThrow(memberId);
+    ReviewForm reviewForm = reviewFormRepository.findByIdOrThrow(reviewFormId);
     ReviewRecord reviewRecord = getOrCreateReviewRecord(writer, reviewForm, request);
 
     reviewRecordRepository.save(reviewRecord);
@@ -88,11 +82,11 @@ public class ReviewService {
   @Transactional
   public void submitReview(Long memberId, Long reviewFormId, ReviewSaveRequest request) {
 
-    Member writer = findMemberById(memberId);
-    ReviewForm reviewForm = findReviewFormById(reviewFormId);
+    Member writer = memberRepository.findByIdOrThrow(memberId);
+    ReviewForm reviewForm = reviewFormRepository.findByIdOrThrow(reviewFormId);
     ReviewRecord reviewRecord = getOrCreateReviewRecord(writer, reviewForm, request);
-
     reviewRecord.submit();
+
     reviewRecordRepository.save(reviewRecord);
   }
 
@@ -116,25 +110,7 @@ public class ReviewService {
     }
   }
 
-  private Member findMemberById(Long memberId) {
-    return memberRepository.findById(memberId)
-        .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
-  }
-
-  private Project findProjectById(Long projectId) {
-    return projectRepository.findById(projectId)
-        .orElseThrow(() -> new RestApiException(ProjectErrorCode.PROJECT_NOT_FOUND));
-  }
-
-  private ReviewForm findReviewFormById(Long reviewFormId) {
-    return reviewFormRepository.findById(reviewFormId)
-        .orElseThrow(() -> new RestApiException(ReviewErrorCode.REVIEW_FORM_NOT_FOUND));
-  }
-
   private void validateQuestionIds(List<Long> questionIdList) {
-    questionIdList.forEach(id ->
-        choiceQuestionRepository.findById(id)
-            .orElseThrow(() -> new RestApiException(ReviewErrorCode.QUESTION_NOT_FOUND))
-    );
+    questionIdList.forEach(choiceQuestionRepository::findByIdOrThrow);
   }
 }
