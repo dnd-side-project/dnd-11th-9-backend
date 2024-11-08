@@ -7,7 +7,7 @@ import com._119.wepro.project.dto.request.ProjectRequest.ProjectUpdateRequest;
 import com._119.wepro.project.dto.response.MyProjectResponse;
 import com._119.wepro.project.dto.response.ProjectDetailResponse;
 import com._119.wepro.project.dto.response.ProjectListResponse;
-import com._119.wepro.project.dto.response.ProjectMemberResponse;
+import com._119.wepro.project.dto.response.MemberRequestStatusResponse;
 import com._119.wepro.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -203,11 +203,11 @@ public class ProjectController {
     return ResponseEntity.ok(null);
   }
 
-  @Operation(summary = "리뷰 요청할 때 프로젝트 멤버 조회 API")
-  @GetMapping("/members/request/review")
-  public ResponseEntity<ProjectMemberResponse> getProjectMembersWithReviewRequest(
-      @RequestParam Long reviewFormId) {
+  @Operation(summary = "리뷰 요청할 때 프로젝트 멤버 조회", description = "리뷰 요청 가능 여부를 포함하여 프로젝트 멤버 정보를 조회합니다.")
+  @GetMapping("/members/request/review/{reviewFormId}")
+  public ResponseEntity<List<MemberRequestStatusResponse>> getProjectMembersWithRequestStatus(
+      @PathVariable("reviewFormId") Long reviewFormId) {
     securityUtil.getCurrentMemberId();
-    return ResponseEntity.ok(projectService.getProjectMembersWithReviewRequest(reviewFormId));
+    return ResponseEntity.ok(projectService.getProjectMembersWithRequestStatus(reviewFormId));
   }
 }

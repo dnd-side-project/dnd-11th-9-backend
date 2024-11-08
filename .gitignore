@@ -37,3 +37,4 @@ out/
 .vscode/
 
 db/mysql/data/*
+/src/main/generated/
