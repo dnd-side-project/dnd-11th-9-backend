@@ -35,7 +35,7 @@ public class ReviewRequest {
     private Long reviewFormId;
 
     @NotNull
-    private List<Long> memberIdList;
+    private Long reviewerId;
   }
 
   @Getter
