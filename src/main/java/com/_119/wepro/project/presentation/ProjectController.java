@@ -12,6 +12,7 @@ import com._119.wepro.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -203,8 +204,33 @@ public class ProjectController {
     return ResponseEntity.ok(null);
   }
 
-  @Operation(summary = "리뷰 요청할 때 프로젝트 멤버 조회", description = "리뷰 요청 가능 여부를 포함하여 프로젝트 멤버 정보를 조회합니다.")
   @GetMapping("/members/request/review/{reviewFormId}")
+  @Operation(summary = "리뷰 요청할 때 프로젝트 멤버 조회", description = "리뷰 요청 가능 여부를 포함하여 프로젝트 멤버 정보를 조회합니다.")
+  @ApiResponse(
+      responseCode = "200",
+      description = "성공",
+      content = @Content(
+          mediaType = "application/json",
+          examples = @ExampleObject(
+              value = "[\n" +
+                  "    {\n" +
+                  "        \"id\": 1,\n" +
+                  "        \"profileUrl\": \"https://img1.kakaocdn.net/thumb/R110x110.q70/?fname=https://t1.kakaocdn.net/account_images/default_profile.jpeg\",\n" +
+                  "        \"name\": \"김희진\",\n" +
+                  "        \"tag\": \"1\",\n" +
+                  "        \"alreadyRequest\": true\n" +
+                  "    },\n" +
+                  "    {\n" +
+                  "        \"id\": 2,\n" +
+                  "        \"profileUrl\": null,\n" +
+                  "        \"name\": \"테스트1\",\n" +
+                  "        \"tag\": \"2\",\n" +
+                  "        \"alreadyRequest\": false\n" +
+                  "    }\n" +
+                  "]"
+          )
+      )
+  )
   public ResponseEntity<List<MemberRequestStatusResponse>> getProjectMembersWithRequestStatus(
       @PathVariable("reviewFormId") Long reviewFormId) {
     securityUtil.getCurrentMemberId();
