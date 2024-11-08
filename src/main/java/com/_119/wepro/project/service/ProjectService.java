@@ -20,6 +20,8 @@ import com._119.wepro.project.dto.request.ProjectRequest.ProjectUpdateRequest;
 import com._119.wepro.project.dto.response.MyProjectResponse;
 import com._119.wepro.project.dto.response.ProjectDetailResponse;
 import com._119.wepro.project.dto.response.ProjectListResponse;
+import com._119.wepro.project.dto.response.ProjectMemberResponse;
+import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class ProjectService {
   private final ProjectMemberCustomRepository projectMemberCustomRepository;
   private final MemberRepository memberRepository;
   private final ProjectCustomRepository projectCustomRepository;
+  private final ReviewFormRepository reviewFormRepository;
 
   public List<ProjectListResponse> searchProjects(String keyword) {
     List<Project> result = projectCustomRepository.searchProjects(keyword);
@@ -150,5 +153,14 @@ public class ProjectService {
 
     project.setMemberNum(project.getMemberNum() + 1);
     projectRepository.save(project);
+  }
+
+  public ProjectMemberResponse getProjectMembersWithReviewRequest(Long reviewFormId) {
+
+    reviewFormRepository.findByIdOrThrow(reviewFormId);
+    List<ProjectMember> filteredMembers = projectMemberCustomRepository.getProjectMembersWithoutReviewRequest(
+        reviewFormId);
+
+    return ProjectMemberResponse.of(filteredMembers);
   }
 }
