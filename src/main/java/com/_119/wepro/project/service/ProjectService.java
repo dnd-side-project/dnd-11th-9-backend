@@ -17,9 +17,11 @@ import com._119.wepro.project.domain.repository.ProjectMemberRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectCreateRequest;
 import com._119.wepro.project.dto.request.ProjectRequest.ProjectUpdateRequest;
+import com._119.wepro.project.dto.response.MemberRequestStatusResponse;
 import com._119.wepro.project.dto.response.MyProjectResponse;
 import com._119.wepro.project.dto.response.ProjectDetailResponse;
 import com._119.wepro.project.dto.response.ProjectListResponse;
+import com._119.wepro.review.domain.repository.ReviewFormRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class ProjectService {
   private final ProjectMemberCustomRepository projectMemberCustomRepository;
   private final MemberRepository memberRepository;
   private final ProjectCustomRepository projectCustomRepository;
+  private final ReviewFormRepository reviewFormRepository;
 
   public List<ProjectListResponse> searchProjects(String keyword) {
     List<Project> result = projectCustomRepository.searchProjects(keyword);
@@ -78,7 +81,8 @@ public class ProjectService {
   @Transactional
   public Long updateProject(Long projectId, ProjectUpdateRequest projectUpdateRequest) {
     Project project = projectRepository.findById(projectId)
-        .orElseThrow(() -> new IllegalArgumentException("Project not found with id: " + projectId));
+        .orElseThrow(
+            () -> new IllegalArgumentException("Project not found with id: " + projectId));
 
     Project updatedProject = Project.of(projectUpdateRequest);
 
@@ -118,8 +122,9 @@ public class ProjectService {
 
 
   public Long deleteProject(Long projectId) {
-    Project project = projectRepository.findById(projectId).orElseThrow(() -> new RestApiException(
-        RESOURCE_NOT_FOUND));
+    Project project = projectRepository.findById(projectId)
+        .orElseThrow(() -> new RestApiException(
+            RESOURCE_NOT_FOUND));
     projectRepository.delete(project);
 
     return project.getId();
@@ -150,5 +155,11 @@ public class ProjectService {
 
     project.setMemberNum(project.getMemberNum() + 1);
     projectRepository.save(project);
+  }
+
+  public List<MemberRequestStatusResponse> getProjectMembersWithRequestStatus(Long reviewFormId) {
+
+    reviewFormRepository.findByIdOrThrow(reviewFormId);
+    return projectMemberCustomRepository.getProjectMembersWithReviewRequestStatus(reviewFormId);
   }
 }

@@ -7,7 +7,6 @@ import com._119.wepro.global.exception.errorcode.ReviewErrorCode;
 import com._119.wepro.member.domain.Member;
 import com._119.wepro.member.domain.repository.MemberRepository;
 import com._119.wepro.project.domain.Project;
-import com._119.wepro.project.domain.ProjectMember;
 import com._119.wepro.project.domain.repository.ProjectMemberCustomRepository;
 import com._119.wepro.project.domain.repository.ProjectRepository;
 import com._119.wepro.review.domain.ReviewForm;
@@ -21,7 +20,6 @@ import com._119.wepro.review.dto.SubAnswerDto;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewAskRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewFormCreateRequest;
 import com._119.wepro.review.dto.request.ReviewRequest.ReviewSaveRequest;
-import com._119.wepro.review.dto.response.ReviewResponse.ProjectMemberGetResponse;
 import com._119.wepro.review.dto.response.ReviewResponse.ReviewFormCreateResponse;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -59,18 +57,9 @@ public class ReviewService {
   public void requestReview(ReviewAskRequest request, Long memberId) {
 
     Member member = memberRepository.findByIdOrThrow(memberId);
-    request.getMemberIdList().forEach(reviewerId -> {
-      alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST,
-          request.getReviewFormId());
-    });
-  }
-
-  public ProjectMemberGetResponse getProjectMembers(Long reviewFormId) {
-    reviewFormRepository.findByIdOrThrow(reviewFormId);
-    List<ProjectMember> filteredMembers = projectMemberCustomRepository.getProjectMembersWithoutReviewRequest(
-        reviewFormId);
-
-    return ProjectMemberGetResponse.of(filteredMembers);
+    Long reviewerId = request.getReviewerId();
+    Long reviewFormId = request.getReviewFormId();
+    alarmService.createAlarm(member, reviewerId, AlarmType.REVIEW_REQUEST, reviewFormId);
   }
 
   @Transactional
